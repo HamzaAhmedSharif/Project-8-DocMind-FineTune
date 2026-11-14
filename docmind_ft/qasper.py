@@ -23,7 +23,7 @@ class Answer:
     worker_id: str
     unanswerable: bool
     extractive_spans: tuple[str, ...]
-    yes_no: bool
+    yes_no: bool | None  # None for non-yes/no answers (2266 in train)
     free_form_answer: str
     evidence: tuple[str, ...]
     highlighted_evidence: tuple[str, ...]
@@ -79,8 +79,12 @@ def _paragraphs(full_text: list[dict[str, Any]]) -> tuple[Paragraph, ...]:
     paragraphs = []
     offset = 0
     for section in full_text:
-        name = section["section_name"]
+        # Real data has null section names and null/blank paragraphs; they
+        # carry no words, so skip them (offsets are unaffected).
+        name = section["section_name"] or ""
         for text in (name, *section["paragraphs"]):
+            if text is None or not text.strip():
+                continue
             end = offset + len(text.split())
             paragraphs.append(Paragraph(name, text, offset, end))
             offset = end
@@ -90,8 +94,8 @@ def _paragraphs(full_text: list[dict[str, Any]]) -> tuple[Paragraph, ...]:
 def normalize_paper(paper_id: str, raw: dict[str, Any]) -> Paper:
     return Paper(
         paper_id=paper_id,
-        title=raw["title"],
-        abstract=raw["abstract"],
+        title=raw["title"] or "",
+        abstract=raw["abstract"] or "",
         paragraphs=_paragraphs(raw["full_text"]),
         questions=tuple(_question(question) for question in raw["qas"]),
     )

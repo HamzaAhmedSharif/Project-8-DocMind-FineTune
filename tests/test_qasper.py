@@ -83,8 +83,8 @@ RAW: dict[str, Any] = {
     },
     "p2": {
         "title": "Paper Two",
-        "abstract": "An abstract about two.",
-        "full_text": [{"section_name": "Results", "paragraphs": ["Only paragraph here."]}],
+        "abstract": None,
+        "full_text": [{"section_name": None, "paragraphs": [None, "Only paragraph here."]}],
         "qas": [_question("q-test", "What is here?", [])],
         "figures_and_tables": [],
     },
@@ -160,6 +160,15 @@ def test_paragraph_offsets_across_sections(tmp_path: Path) -> None:
     words = [word for paragraph in paragraphs for word in paragraph.text.split()]
     for paragraph in paragraphs:
         assert words[paragraph.word_start : paragraph.word_end] == paragraph.text.split()
+
+
+def test_none_section_names_and_paragraphs_skipped(tmp_path: Path) -> None:
+    paper = _load_fixture(tmp_path)[1]
+    assert paper.abstract == ""
+    assert [
+        (paragraph.section, paragraph.text, paragraph.word_start, paragraph.word_end)
+        for paragraph in paper.paragraphs
+    ] == [("", "Only paragraph here.", 0, 3)]
 
 
 def test_test_split_questions_have_no_annotations(tmp_path: Path) -> None:
