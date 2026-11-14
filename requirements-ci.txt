@@ -3,7 +3,7 @@
 # vendored-module unit tests (domain.py imports numpy; metrics.py imports
 # prometheus_client). The F0 tests do not import llm.py/ingest.py, so
 # openai/pypdf/pydantic stay out of CI for now.
-ruff
-pytest
-numpy
-prometheus_client
+ruff==0.17.5
+pytest==9.2.0
+numpy==2.2.6
+prometheus_client==0.26.0
