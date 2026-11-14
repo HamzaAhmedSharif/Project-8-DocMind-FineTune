@@ -1,0 +1,9 @@
+# Gitleaks allowlist: one historical false positive.
+# In commit faee4e7, tests/test_config.py line 17 set the DOCMIND_LLM_API_KEY
+# fixture to the fake test value "test-llm-key-cccc". It is not a real secret
+# (test-only, no provider prefix). The fixture value has since been changed;
+# this entry covers the old commit, which the full-history scan still sees.
+[allowlist]
+fingerprints = [
+  "faee4e74c68c7cf0bfa7cd21fc321b5a9a9cf4a4:tests/test_config.py:generic-api-key:17",
+]

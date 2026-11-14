@@ -17,13 +17,13 @@ def test_repr_never_contains_secret_values(monkeypatch: pytest.MonkeyPatch) -> N
     # shaped like a real secret must be a real finding, not a test fixture.
     monkeypatch.setenv("HF_TOKEN", "test-token-value-aaaa")
     monkeypatch.setenv("HF_WRITE_TOKEN", "test-write-token-bbbb")
-    monkeypatch.setenv("DOCMIND_LLM_API_KEY", "test-llm-key-cccc")
+    monkeypatch.setenv("DOCMIND_LLM_API_KEY", "test llm key")
     settings = Settings.from_env()
     assert settings.hf_token == "test-token-value-aaaa"
     rendered = repr(settings) + str(settings)
     assert "test-token-value-aaaa" not in rendered
     assert "test-write-token-bbbb" not in rendered
-    assert "test-llm-key-cccc" not in rendered
+    assert "test llm key" not in rendered
     assert "hf_token=set" in rendered
     assert "hf_write_token=set" in rendered
 
