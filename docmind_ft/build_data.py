@@ -24,7 +24,13 @@ from pathlib import Path
 import numpy as np
 
 from docmind_ft.qasper import Paper, Paragraph, Question, load_qasper
-from docmind_ft.retrieval import EMBEDDING_MODEL, TOP_K, FastEmbedder, retrieve
+from docmind_ft.retrieval import (
+    EMBEDDING_MODEL,
+    TOP_K,
+    FastEmbedder,
+    cosine_scores,
+    rank_chunks,
+)
 from docmind_ft.vendor.chunking import CHUNK_OVERLAP, CHUNK_WORDS, chunk_pages
 
 DATA_DIR = Path(r"B:\p8\data\qasper")
@@ -389,16 +395,26 @@ def main() -> int:
     with questions_path.open("w", encoding="utf-8", newline="\n") as handle:
         for question, query_vector in zip(questions, query_vectors, strict=True):
             rows = paper_rows.get(question.paper_id)
-            retrieved = (
-                retrieve(query_vector, vectors[rows], [chunks[row].chunk_id for row in rows], TOP_K)
-                if rows is not None
-                else []
-            )
+            if rows is not None:
+                chunk_ids = [chunks[row].chunk_id for row in rows]
+                scores = cosine_scores(query_vector, vectors[rows])
+                retrieved = rank_chunks(scores, chunk_ids, TOP_K)
+                scores_by_id = dict(zip(chunk_ids, scores, strict=True))
+            else:
+                retrieved = []
+                scores_by_id = {}
             row = asdict(question)
             row["gold_chunk_ids"] = list(question.gold_chunk_ids)
             row["retrieved"] = [
                 {"chunk_id": item.chunk_id, "score": item.score} for item in retrieved
             ]
+            # Context assembly needs the score of a gold chunk even when it
+            # falls outside the top 10, so keep gold scores alongside retrieval.
+            row["gold_scores"] = {
+                chunk_id: float(scores_by_id[chunk_id])
+                for chunk_id in question.gold_chunk_ids
+                if chunk_id in scores_by_id
+            }
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     elapsed = time.perf_counter() - started

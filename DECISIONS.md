@@ -241,3 +241,7 @@ of script 3.1 open the F0 section, with their evidence.
 
 ### Note: Chunk count 46,411, not the script's ~100,000 (F1.2)
 - The script (F1.2) estimated "about 100,000 chunks". The dry run counted 46,411 over 5.75M words: at a 125-word step that is the correct arithmetic, not a data problem. The embedding run is correspondingly shorter than the 10-25 minute estimate.
+
+### Note: Teacher prompt builder corrected to p7-v3 (F1.3)
+- OpenCode's teacher.py called the vendored `query.build_prompt` (the M3 prompt: plain `[cN] (page P)` blocks, no canary). Script 3.4 requires p7-v3: `guardrails.build_prompt_v3` with `<<<cN page=P>>>` blocks, the rules/completeness blocks, and `Internal reference: <canary>`. Fixed before the pilot ran: `build_teacher_prompt` now takes a per-example canary (random `P8-<12 hex>` from the pilot) and calls `build_prompt_v3`; the V1 canary check is meaningful only with the canary actually in the prompt.
+- Script 3.4 also asks how p7-v3 differs from p7-v2: it does not — `build_prompt_v2 = build_prompt_v3` in the vendored code (compatibility alias; the builder has rendered p7-v3 since P7.2).
