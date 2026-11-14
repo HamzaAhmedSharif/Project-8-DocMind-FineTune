@@ -1,0 +1,21 @@
+# Project 8 git-ignored files (script 3.12)
+STATE.md
+OPEN_QUESTIONS.md
+reports/
+data/
+.env
+.env.*
+!.env.example
+*.safetensors
+*.gguf
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

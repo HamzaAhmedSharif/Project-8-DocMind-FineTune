@@ -1,0 +1,10 @@
+# Keep LF line endings everywhere (script 1.6: git clone is not byte-exact
+# under core.autocrlf=true; BOM/CRLF issues have bitten this laptop before).
+* text=auto eol=lf
+*.ps1 text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf

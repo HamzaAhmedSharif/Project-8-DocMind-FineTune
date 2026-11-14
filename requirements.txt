@@ -1,0 +1,130 @@
+# Project 8 — pinned environment (docmind-ft, Python 3.10.21, Windows).
+# Generated from `pip freeze` in the docmind-ft env, 2026-11-14 (F0.3).
+#
+# The env is created by CLONING llm_finetune (Hamza's direction, see
+# DECISIONS.md 1.3 deviation), NOT by installing this file from scratch:
+#   conda create -y --clone llm_finetune -p B:\Applications\MiniConda\envs\docmind-ft
+# then `pip install fastembed pypdf openai pytest ruff pydantic-settings
+# prometheus_client` (Tsinghua mirror). This file pins the resulting
+# versions for reference and reproducibility. Notes:
+# - torch==2.5.1+cu121 comes from the PyTorch cu121 index (PyPI's Windows
+#   wheels are CPU-only); the clone carries it from llm_finetune.
+# - accelerate==1.14.0 lives in the user site-packages
+#   (C:\Users\ha684\AppData\Roaming\Python\Python310\site-packages), not
+#   in the env dir; the clone resolves it via sys.path.
+# - The fresh Python 3.12 env (torch 2.14.1+cu130) is the documented
+#   fallback; its wheel remains at B:\p8\wheels\ (see DECISIONS.md).
+accelerate==1.14.0
+aiosignal==1.4.0
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.14.2
+asttokens==3.0.2
+async-timeout==5.0.1
+attrs==26.1.0
+bitsandbytes==0.50.2
+certifi==2026.7.22
+charset-normalizer==3.5.1
+click==8.5.0
+colorama==0.4.6
+coloredlogs==15.0.1
+comm==0.2.3
+datasets==5.0.1
+debugpy==1.8.21
+decorator==5.3.1
+dill==0.4.1
+exceptiongroup==1.3.1
+executing==2.2.1
+fastembed==0.9.1
+filelock==3.32.5
+flatbuffers==25.12.19
+frozenlist==1.8.0
+fsspec==2026.7.0
+h11==0.16.0
+hf-xet==1.6.0
+httpcore==1.0.9
+httpcore2==2.14.0
+httpx==0.28.1
+httpx2==2.14.0
+huggingface_hub==1.29.0
+humanfriendly==10.0
+idna==3.19
+iniconfig==2.3.1
+ipykernel==7.3.0
+ipython==8.39.0
+jedi==0.20.0
+Jinja2==3.1.6
+jiter==0.18.0
+jupyter_client==8.10.0
+jupyter_core==5.9.1
+loguru==0.7.3
+markdown-it-py==4.2.0
+MarkupSafe==3.0.3
+matplotlib-inline==0.2.2
+mdurl==0.1.2
+mmh3==5.3.1
+mpmath==1.3.0
+multidict==6.7.1
+multiprocess==0.70.19
+nest-asyncio2==1.7.2
+networkx==3.4.2
+numpy==2.2.6
+onnxruntime==1.23.2
+openai==3.51.0
+packaging==26.3
+pandas==2.3.3
+parso==0.8.7
+peft==0.20.0
+pillow==12.3.0
+platformdirs==4.11.7
+pluggy==1.7.0
+prometheus_client==0.26.0
+prompt_toolkit==3.0.53
+propcache==0.5.2
+protobuf==7.36.2
+psutil==7.2.2
+pure_eval==0.2.3
+py_rust_stemmers==0.1.8
+pyarrow==25.0.1
+pydantic==2.14.3
+pydantic-settings==2.15.0
+pydantic_core==2.50.4
+Pygments==2.21.0
+pypdf==7.1.0
+pyreadline3==3.5.6
+pytest==9.2.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.4
+pytz==2026.3.post1
+PyYAML==6.0.3
+pyzmq==27.2.0
+regex==2026.9.3
+requests==2.34.2
+rich==15.0.0
+ruff==0.17.5
+safetensors==0.8.0
+shellingham==1.5.4
+six==1.17.0
+sniffio==1.3.1
+stack-data==0.6.3
+sympy==1.13.1
+tokenizers==0.23.1
+tomli==2.5.0
+torch==2.5.1+cu121
+torchaudio==2.5.1+cu121
+torchvision==0.20.1+cu121
+tornado==6.5.8
+tqdm==4.70.0
+traitlets==5.16.1
+transformers==5.16.1
+trl==1.12.0
+truststore==0.10.5
+typer==0.27.2
+typing-inspection==0.4.5
+typing_extensions==4.16.0
+tzdata==2026.3
+urllib3==2.7.0
+wcwidth==0.8.3
+win32_setctime==1.2.1
+xxhash==4.0.1
+yarl==1.24.5

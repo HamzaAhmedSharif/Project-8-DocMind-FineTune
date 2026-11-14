@@ -1,0 +1,9 @@
+# Packages the CI installs (lint + unit jobs). Pinned after F0.3; keep in sync
+# with the laptop environment. numpy + prometheus_client are needed by the
+# vendored-module unit tests (domain.py imports numpy; metrics.py imports
+# prometheus_client). The F0 tests do not import llm.py/ingest.py, so
+# openai/pypdf/pydantic stay out of CI for now.
+ruff
+pytest
+numpy
+prometheus_client

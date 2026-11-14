@@ -1,0 +1,47 @@
+{
+  "p7_repo": "HamzaAhmedSharif/Project-7-DocMind-Service",
+  "p7_commit": "b0d1f0fbc7eae71ebd3aa4029bde90f5364b1296",
+  "vendored_at": "2026-11-14T12:36:55.944272+00:00",
+  "files": {
+    "chunking.py": {
+      "source": "docmind_service/chunking.py",
+      "sha256": "ce92af751ca8f33025bfd0d1215cf79814b4691bbfaad3d58bef1bb4f4021a96"
+    },
+    "query.py": {
+      "source": "docmind_service/query.py",
+      "sha256": "487e0e5c2c0b22e89c5b86908bc6b5efb31f50165fe9a24043a46cf36f0a919d"
+    },
+    "guardrails.py": {
+      "source": "docmind_service/guardrails.py",
+      "sha256": "06bfed6d708e07b8967ae0e345ddb45fe217f702a66a27f3fac0a5e16a28b1c4"
+    },
+    "llm.py": {
+      "source": "docmind_service/llm.py",
+      "sha256": "f94e64f2717916edaf53398ccb3cbbc2407e75cfa7c1b317c5065c9890e4d50a"
+    },
+    "ingest.py": {
+      "source": "docmind_service/ingest.py",
+      "sha256": "9855975911074828d9f3567a02303f8aedbf38b27fa8546bd9912b58ff835c37"
+    },
+    "domain.py": {
+      "source": "docmind_service/domain.py",
+      "sha256": "14074c2719a1b9c8404befffa85b8555a4346f4811a992214b3afdff86b15d7a"
+    },
+    "config.py": {
+      "source": "docmind_service/config.py",
+      "sha256": "3146bbf77b2ebd5050f0693f4aca73188d1ad1068681959c86c5de6970c818d9"
+    },
+    "metrics.py": {
+      "source": "docmind_service/metrics.py",
+      "sha256": "84f7362aeaf52d031e2bbdbe29ca37d8afae41594acbe30ac60a5aa24f9bc3de"
+    },
+    "scoring.py": {
+      "source": "evaluation/scoring.py",
+      "sha256": "5b9cea9904aaa420900447e99e40fdfd5319a5e8866f3cb8df6bca58e6eea99d"
+    },
+    "ledger.py": {
+      "source": "evaluation/ledger.py",
+      "sha256": "5b158b79837cdf36e2a9e47f8c3a9a8c9fc444285aa286cdac77c574fd9e059a"
+    }
+  }
+}
