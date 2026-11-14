@@ -12,15 +12,18 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def test_repr_never_contains_secret_values(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("HF_TOKEN", "hf_SECRETVALUE1234567890")
-    monkeypatch.setenv("HF_WRITE_TOKEN", "hf_WRITESECRET1234567890")
-    monkeypatch.setenv("DOCMIND_LLM_API_KEY", "gsk_SECRETKEY1234567890")
+    # Fake values deliberately do NOT look like real tokens (no provider
+    # prefix), so the verify.ps1 secret scan stays meaningful: anything
+    # shaped like a real secret must be a real finding, not a test fixture.
+    monkeypatch.setenv("HF_TOKEN", "test-token-value-aaaa")
+    monkeypatch.setenv("HF_WRITE_TOKEN", "test-write-token-bbbb")
+    monkeypatch.setenv("DOCMIND_LLM_API_KEY", "test-llm-key-cccc")
     settings = Settings.from_env()
-    assert settings.hf_token == "hf_SECRETVALUE1234567890"
+    assert settings.hf_token == "test-token-value-aaaa"
     rendered = repr(settings) + str(settings)
-    assert "hf_SECRETVALUE1234567890" not in rendered
-    assert "hf_WRITESECRET1234567890" not in rendered
-    assert "gsk_SECRETKEY1234567890" not in rendered
+    assert "test-token-value-aaaa" not in rendered
+    assert "test-write-token-bbbb" not in rendered
+    assert "test-llm-key-cccc" not in rendered
     assert "hf_token=set" in rendered
     assert "hf_write_token=set" in rendered
 

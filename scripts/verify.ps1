@@ -24,7 +24,10 @@ function Invoke-Step([string]$Name, [scriptblock]$Cmd) {
 Invoke-Step "check.ps1" { powershell -NoProfile -File scripts\check.ps1 }
 
 Write-Output "--- secret scan ---"
-$patterns = "hf_[A-Za-z0-9]{20,}|gsk_|sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|tvly-|AIzaSy|AQ\.Ab"
+# Bare prefixes are written with a bracketed last char, so the pattern
+# still matches the real prefix but the scanner does not flag its own
+# pattern line (or this comment) for containing one.
+$patterns = "hf_[A-Za-z0-9]{20,}|gs[k]_|sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|tvl[y]-|AIzaS[y]|AQ\.Ab"
 $tracked = git ls-files
 $hits = @()
 foreach ($f in $tracked) {
