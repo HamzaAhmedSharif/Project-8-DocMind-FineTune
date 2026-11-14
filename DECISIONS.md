@@ -229,3 +229,15 @@ of script 3.1 open the F0 section, with their evidence.
 - Cause: network restriction (script RK3).
 - Fix: `HF_HOME=B:\p8\hf-cache` + `HF_ENDPOINT=https://hf-mirror.com` for that command only.
 - Lesson: n/a (script rule).
+
+## F1 - Evaluation sets and training data (2026-11-15)
+
+### Decision: Retrieval is scoped to each question's own paper (F1.2)
+- Context: script 3.5 step 3 says "retrieve top 10 per question by cosine similarity" without stating the candidate pool. QASPER questions are paper-specific and every gold evidence paragraph lives in the question's paper; context assembly (3.5 step 5) assumes a per-paper ranked list ("fill with the next-ranked non-gold chunks").
+- Chosen: each question is ranked only against its own paper's chunks (docmind_ft/build_data.py main: rows_by_paper; retrieval.retrieve over one paper's pool). Evidence: F1.2 dry run 2026-11-15 — 46,411 chunks over 5.75M words; Q-DEV/Q-TEST splits valid.
+- Rejected: corpus-wide retrieval across all 1,585 papers (gold chunks could be crowded out of the top 10 by other papers' chunks, breaking the gold mapping and the abstention design; the retrieved context would mostly be same-topic noise from other papers).
+- Tradeoff accepted: the retrieval task is easier than corpus-wide (within-paper ranking); the gold_in_top10 rate measures within-paper retrieval quality, not corpus retrieval. The fine-tuned generator is still evaluated on identical frozen contexts as the baselines, so the comparison stays fair.
+- Would revisit if: never after the F2.7 freeze (contexts are frozen in F1.6).
+
+### Note: Chunk count 46,411, not the script's ~100,000 (F1.2)
+- The script (F1.2) estimated "about 100,000 chunks". The dry run counted 46,411 over 5.75M words: at a 125-word step that is the correct arithmetic, not a data problem. The embedding run is correspondingly shorter than the 10-25 minute estimate.
