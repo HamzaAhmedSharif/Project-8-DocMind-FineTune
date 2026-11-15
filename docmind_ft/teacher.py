@@ -124,11 +124,15 @@ def build_teacher_prompt(
     human: str,
     gold_chunk_ids: Sequence[str],
     canary: str,
+    *,
+    include_hint: bool = True,
 ) -> tuple[str, dict[str, RetrievedChunk]]:
-    """Render the vendored p7-v3 student prompt, then insert the hint after the question."""
+    """Render the p7-v3 prompt, optionally inserting the hint after the question."""
+    prompt, mapping = build_prompt_v3(question, list(chunks)[:TOP_K], canary)
+    if not include_hint:
+        return prompt, mapping
     if not human.strip():
         raise ValueError("teacher prompt needs a non-empty human answer")
-    prompt, mapping = build_prompt_v3(question, list(chunks)[:TOP_K], canary)
     gold = set(gold_chunk_ids)
     supporting = [short for short, chunk in mapping.items() if chunk.chunk_id in gold]
     if not supporting:
@@ -226,6 +230,20 @@ def v3_correct(
     return Check(False, f"token F1 {best:.3f} < {MIN_TOKEN_F1:.2f}")
 
 
+def check_correctness(
+    answer: str,
+    *,
+    expected_yes_no: bool | None,
+    reference_answers: Sequence[str],
+) -> Check:
+    """Public V3 check, shared by the filter and the gold-free probe."""
+    return v3_correct(
+        answer,
+        expected_yes_no=expected_yes_no,
+        reference_answers=reference_answers,
+    )
+
+
 def _longest_shared_run(answer: str, chunk: str) -> int:
     left = answer.split()
     right = chunk.split()
@@ -270,7 +288,7 @@ def verify_answer(
         ("V2", v2_cites_gold(answer, gold_chunk_ids=gold_chunk_ids)),
         (
             "V3",
-            v3_correct(
+            check_correctness(
                 answer,
                 expected_yes_no=expected_yes_no,
                 reference_answers=reference_answers,

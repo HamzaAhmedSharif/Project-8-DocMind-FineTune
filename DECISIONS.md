@@ -265,3 +265,17 @@ of script 3.1 open the F0 section, with their evidence.
 - Would-revisit: if F1.4's full-build acceptance audit shows the
   hint-dependence rate materially above the pilot's 2/25, tighten the
   filter (e.g. require cited-chunk token overlap) and re-run.
+
+### Note: p0 probe runs without the hint (F1.4)
+
+- Context: script section 3.5 step 5 says the p0-branch target is
+  abstention "only if the teacher also fails to answer correctly from
+  that context". Step 6 gives the teacher the hint block (human answer)
+  for generation.
+- Chosen: the p0 probe calls the teacher WITHOUT the hint. With the hint
+  the teacher would parrot the human answer and pass V3 trivially, so
+  every p0 example would be dropped as ambiguous and the abstention
+  share could never reach 20%. The probe tests whether the gold-free
+  context itself supports an answer.
+- Tradeoff: the probe measures the teacher's unaided behaviour on
+  gold-free context, which is the quantity the p0 formula needs.
