@@ -57,10 +57,15 @@ Q-TEST stratification uses them.
   single-threaded, and the re-run hit the cache (build in 225 s).
 - Gold coverage (script section 3.5 step 4): 4,303 of 5,049 questions
   have gold chunks (the rest are unanswerable or gold-less). A gold chunk
-  appears in the top-10 for 86.5% overall (3,721 / 4,303): train 86.1%,
-  dev 86.4%, test 90.6%. By answer type: extractive 87.1%, free-form
-  85.5%, yes/no 84.9%. Note: dev yes/no is 65.0% (13 / 20) on a small
+  appears in the top-10 for 86.5% overall (3,721 / 4,303): train 82.7%
+  (1,738 / 2,101), dev 88.9% (793 / 892), test 90.8% (1,190 / 1,310).
+  On the frozen eval samples: Q-DEV 86.4% (153 / 177), Q-TEST 90.6%
+  (328 / 362). By answer type: extractive 87.1%, free-form 85.5%,
+  yes/no 84.9%. Note: Q-DEV yes/no is 65.0% (13 / 20) on a small
   sample — a watch item, not a gate failure.
+- Train composition for F1.4: 2,593 questions — 2,101 answerable with
+  gold, 271 unanswerable, 221 answerable without gold (excluded from
+  training: they cannot pass the V2 gold-citation check).
 - Artifacts under `B:\p8\data\work\`: `chunks.jsonl` (46,411 rows),
   `embeddings.npy` (46,411 x 384), `questions.jsonl` (5,049 rows,
   including `gold_scores`: gold chunk id to real cosine score).
