@@ -245,3 +245,23 @@ of script 3.1 open the F0 section, with their evidence.
 ### Note: Teacher prompt builder corrected to p7-v3 (F1.3)
 - OpenCode's teacher.py called the vendored `query.build_prompt` (the M3 prompt: plain `[cN] (page P)` blocks, no canary). Script 3.4 requires p7-v3: `guardrails.build_prompt_v3` with `<<<cN page=P>>>` blocks, the rules/completeness blocks, and `Internal reference: <canary>`. Fixed before the pilot ran: `build_teacher_prompt` now takes a per-example canary (random `P8-<12 hex>` from the pilot) and calls `build_prompt_v3`; the V1 canary check is meaningful only with the canary actually in the prompt.
 - Script 3.4 also asks how p7-v3 differs from p7-v2: it does not — `build_prompt_v2 = build_prompt_v3` in the vendored code (compatibility alias; the builder has rendered p7-v3 since P7.2).
+
+### Decision: Distilled targets for training data (F1.3)
+
+- Context: 150-example teacher pilot (qwen3:8b, p7-v3 prompt, V1–V4
+  filter). Pass rate 79/150 (52.7%); fails V1=4, V2=5, V3=62, V4=0.
+  Audit of 25 sampled accepted answers against the five-point rubric:
+  23/25 acceptable (reports/F1-pilot-audit.md).
+- Chosen: distilled targets for F1.4. Both pre-registered gates met:
+  pass rate 52.7% >= 45%, audit 23/25 >= 23/25.
+- Rejected: Option A (human-answer targets + best-gold citation). Not
+  needed: the teacher's accepted answers are predominantly
+  chunk-supported.
+- Tradeoff: the audit passes exactly at the threshold. Both failures are
+  hint-dependence — the teacher reproducing a reference detail absent
+  from the cited chunks (dataset names; "binary cross entropy loss").
+  V3 is the binding filter (62/71 fails). ~6/25 accepted answers carry
+  a filler meta-sentence; harmless noise, kept as-is.
+- Would-revisit: if F1.4's full-build acceptance audit shows the
+  hint-dependence rate materially above the pilot's 2/25, tighten the
+  filter (e.g. require cited-chunk token overlap) and re-run.
