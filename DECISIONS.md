@@ -279,3 +279,17 @@ of script 3.1 open the F0 section, with their evidence.
   context itself supports an answer.
 - Tradeoff: the probe measures the teacher's unaided behaviour on
   gold-free context, which is the quantity the p0 formula needs.
+
+### Decision: p0 = 0.00264 for the teacher build (F1.4)
+
+- Context: script section 3.5 step 5 chooses p0 so the final abstention
+  share is 20% +/- 3%. The calibration probe (200 A questions, no hint,
+  seed 20261207, pilot ids excluded) measured r = 0.915 (183/200 fails).
+- Chosen: p0 = 0.00264 from the pre-registered formula with A = 2101,
+  U = 271, q = 0.527 (pilot pass rate), r = 0.915. Recorded in
+  B:\p8\data\work\p0.json (job f1-calib-p0c, 2026-11-20).
+- Consequence: only ~5-6 A questions fall in the p0 branch. Abstention
+  comes almost entirely from the 271 unanswerable questions (10.5% of
+  train, double the dev/test rate), so the script's expected p0 of
+  0.10-0.12 does not apply to this data. Expected train.jsonl ~1,400
+  with abstention share ~20%.
