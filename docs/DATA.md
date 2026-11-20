@@ -69,3 +69,71 @@ Q-TEST stratification uses them.
 - Artifacts under `B:\p8\data\work\`: `chunks.jsonl` (46,411 rows),
   `embeddings.npy` (46,411 x 384), `questions.jsonl` (5,049 rows,
   including `gold_scores`: gold chunk id to real cosine score).
+
+## F1.4 train files (2026-11-20)
+
+Three frozen train files under `data/`, produced from the 2,593 Q-TRAIN
+questions (2,101 answerable with gold, 271 unanswerable; 221 answerable
+without gold excluded from training).
+
+| File | Rows | Abstention share | I2 valid share |
+|---|---|---:|---:|
+| `data/train.jsonl` | 1,444 | 0.1891 | 0.9903 |
+| `data/train_nodistill.jsonl` | 1,444 | 0.1891 | 1.0000 |
+| `data/train_data25.jsonl` | 362 | 0.1796 | 0.9945 |
+
+Each row stores `prompt`, `completion` and `meta` (`question_id`, `paper_id`,
+`case`, `answer_type`, `branch`, `canary`). Full per-file I2 error details in
+`reports/F1-train-stats.json`.
+
+## F1.5 HOLD set (frozen 2026-11-20)
+
+- 96 items (84 answerable, 12 unanswerable), 4 per paper across 24 post-cutoff
+  papers, IDs `h01`-`h96`.
+- Location: `evaluation/holdout/holdout_questions.jsonl`.
+- Freeze hash (SHA-256): `43b7637e2841b81eef50e8745b7275f2abeadaec5af975c3423e631a5be6a8b3`
+  (recorded in `evaluation/gates.json`).
+- Retrievability: 68 of the 84 answerable items retrievable in the top-10
+  (informational only; unretrievable items are kept).
+- Verifier: `scripts/verify_holdout.py` passes 96/96 (exit 0).
+
+## F1.6 PAPER16 and frozen contexts (2026-11-20)
+
+### PAPER16
+- 16 questions (`d01`-`d12`, `a01`-`a04`) vendored from Project 7 into
+  `evaluation/paper16/questions.py`; web questions (`w01`-`w04`) excluded.
+- Source paper: "Attention Is All You Need" (arXiv 1706.03762v7).
+- Local copy: `B:\p8\data\paper16\attention.pages.json` (15 pages).
+- PDF SHA-256: `bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697`
+  (verified against the P7 corpus manifest).
+
+### Frozen retrieval contexts
+Four files under `evaluation/contexts/` (chunk texts not stored; re-derived from
+paper text at harness run time). Row format:
+`{"question_id", "paper_id", "chunks": [{"chunk_id", "score", "page"}, ...]}`,
+top-10 per question, own paper only, scores rounded to 6 decimals.
+
+| File | Rows | SHA-256 |
+|---|---|---|
+| `contexts_qdev.jsonl` | 200 | `1e6a9acecb34900e46d62db27a5e10bb9bc9daf1eb45a14a44b0e7ffe9718ead` |
+| `contexts_qtest.jsonl` | 400 | `867228f1d345327cb0d77cfdaafc955b0f9a24bd748895f144d1ea3b61948bac` |
+| `contexts_hold.jsonl` | 96 | `4e51514b0b1dabace57b04a3b114eaf6b9abeca95b616f777624bd12377ce044` |
+| `contexts_paper16.jsonl` | 16 | `d5ac1fe4a34af4f2478bdcea690d686a7607e7846d77f6c5e10574312be505d1` |
+
+Hashes recorded in `reports/hashes.json`; build is byte-for-byte reproducible
+(run twice, identical output).
+
+## F1.7 leakage gate I1 (2026-11-20)
+
+Gate I1 proves the training data cannot leak the evaluation sets. All three
+checks pass (`scripts/check_leakage.py`, exit 0; report in
+`reports/F1-leakage.md`):
+
+1. **Paper-id overlap**: zero overlap among Q-TRAIN (888 papers), Q-DEV
+   (144 papers) and Q-TEST (271 papers).
+2. **Title overlap**: zero normalized-title overlap between the 1,585 QASPER
+   papers and the 24 HOLD manifest titles or the Transformer paper title
+   ("Attention Is All You Need").
+3. **13-gram matches**: zero exact 13-gram matches between any train row
+   (5,204,916 instances; 1,586,838 distinct) and any HOLD/PAPER16 question,
+   gold answer or key fact (195 distinct eval 13-grams).

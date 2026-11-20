@@ -343,3 +343,11 @@ of script 3.1 open the F0 section, with their evidence.
 - Short papers: 1 Q-DEV row has 5 chunks and 10 Q-TEST rows have 5/8/9 chunks (papers with fewer than 10 chunks) — expected, not a defect.
 - Reproducibility: the build was run twice by OpenCode and once more by Sol — all three runs byte-for-byte identical (same four hashes). Hashes recorded in reports/hashes.json (git-ignored) and here.
 - pyproject.toml: evaluation/paper16/questions.py added to ruff's exclude list so the vendored file is never reformatted (same treatment as docmind_ft/vendor).
+
+### Note: Leakage gate I1 passed; F1 complete (F1.7)
+
+- Gate I1 PASSED (scripts/check_leakage.py, exit 0): paper-id overlap zero (train 888 / dev 144 / test 271 papers); title overlap zero (1,585 QASPER titles vs 24 HOLD titles + Transformer title); 13-gram matches zero (train 5,204,916 instances / 1,586,838 distinct vs 195 eval distinct). Report: reports/F1-leakage.md.
+- Seeded-leak tests (tests/test_leakage.py) detect all three planted leak types (shared paper id, shared title, shared 13-gram).
+- DATA.md finalized (train files, HOLD, PAPER16 + contexts with hashes, I1 result).
+- CI fix by Sol (verification): the leakage smoke test and the PAPER16 contexts test read laptop data files with no skip guard and would have failed on the CI runner. Guards added in the F1.4-established style (skip when the artifacts are absent); verified to trigger on missing data and to pass with data present. Full suite: 145 tests pass, ruff clean.
+- F1 verdict: PASS (reports/F1-verdict.md). [H5] requested.

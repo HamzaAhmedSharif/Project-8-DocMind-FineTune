@@ -6,9 +6,11 @@ import re
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from docmind_ft.contexts import (  # noqa: E402
     PAPER16_EXPECTED_IDS,
+    PAPER16_PAGES,
     _build_contexts,
     _load_paper16_questions,
     _write_jsonl,
@@ -106,6 +108,8 @@ def test_paper16_selection_exactly_16_no_web():
 
 
 def test_paper16_chunk_ids_use_transformer_paper():
+    if not PAPER16_PAGES.exists():
+        pytest.skip("Transformer paper pages are not available")
     rows = build_paper16_contexts(FakeEmbedder())
     assert len(rows) == 16
     for row in rows:
