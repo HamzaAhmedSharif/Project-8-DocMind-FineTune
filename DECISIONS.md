@@ -312,3 +312,10 @@ of script 3.1 open the F0 section, with their evidence.
 - Result: train.jsonl 1,444 rows (1,171 distilled + 273 abstentions),
   gold pass rate 55.8%, abstention share 18.9% (target 20% +/- 3%).
   Below the 1,500-row target - recorded deviation, not a gate failure.
+
+### Note: HOLD fetch verified 24/24; extracted-text quirks for authoring (F1.5a)
+
+- Context: fetch_heldout.py downloaded the 24 P7-manifest papers to B:\p8\data\holdout\; all SHA-256 verified, 0 BLOCKED; extracted page counts match the manifest for all 24 (total 1,259,370 chars). Sol independently re-verified one PDF hash against the manifest and ran the full suite herself (124 tests, ruff + format clean).
+- Chosen: authoring (F1.5b) works from the extracted .pages.json files. Two text quirks to respect when writing verbatims: (1) line-break hyphenation is preserved in the extracted text ("comprehen-\nsive"), so a verbatim must never span a hyphenated break; (2) undecodable glyphs appear as the replacement character (U+FFFD), never include them in a verbatim. The verifier catches both, but authoring around them saves fix cycles.
+- Note: fetch_heldout.py stops at the first BLOCKED paper (returns 1) instead of continuing with the rest; a re-run resumes from the cache, so the cost is one extra run. Not worth changing while 0 papers are blocked.
+- Note: the verifier's retrieval path was unit-tested with a mocked embedder, so Sol ran a synthetic 2-item end-to-end check with the real MiniLM embedder before authoring: 2/2 passed, the answerable item retrievable. The mocked-retrieval risk is retired.
