@@ -407,6 +407,35 @@ def test_i2_jsonl_counts_invalid_json(tmp_path) -> None:
     assert stats["errors"]
 
 
+def test_i2_nodistill_exception_skips_length_only() -> None:
+    long_row = copy.deepcopy(_i2_row())
+    long_row["completion"][0]["content"] = " ".join(["word"] * 150) + " [c1]"
+    assert validate_trl_row(long_row)
+    assert validate_trl_row(long_row, check_length=False) == []
+
+    many_sentences = copy.deepcopy(_i2_row())
+    many_sentences["completion"][0]["content"] = "A. B. C. D. E. [c1]"
+    assert validate_trl_row(many_sentences)
+    assert validate_trl_row(many_sentences, check_length=False) == []
+
+    bad_citation = copy.deepcopy(_i2_row())
+    bad_citation["completion"][0]["content"] = "alpha [c99]"
+    assert validate_trl_row(bad_citation, check_length=False)
+
+    no_citation = copy.deepcopy(_i2_row())
+    no_citation["completion"][0]["content"] = " ".join(["word"] * 150)
+    assert validate_trl_row(no_citation, check_length=False)
+
+
+def test_i2_stats_passes_check_length_through(tmp_path) -> None:
+    row = copy.deepcopy(_i2_row())
+    row["completion"][0]["content"] = " ".join(["word"] * 150) + " [c1]"
+    path = tmp_path / "rows.jsonl"
+    path.write_text(json.dumps(row) + "\n", encoding="utf-8")
+    assert i2_stats(path)["valid"] == 0
+    assert i2_stats(path, check_length=False)["valid"] == 1
+
+
 def test_p0_formula_and_clamp() -> None:
     assert compute_p0(2101, 271, 0.527, 0.8) == pytest.approx(0.002966, abs=1e-6)
     assert compute_p0(10, 100, 0.527, 0.8) == 0.0

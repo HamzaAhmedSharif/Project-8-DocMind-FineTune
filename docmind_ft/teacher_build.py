@@ -555,8 +555,14 @@ def sentence_count(text: str) -> int:
     return len([part for part in SENTENCE_RE.split(plain) if part.strip()])
 
 
-def validate_trl_row(row: Mapping[str, object]) -> list[str]:
-    """Prototype I2 checks for one conversational prompt-completion row."""
+def validate_trl_row(row: Mapping[str, object], *, check_length: bool = True) -> list[str]:
+    """Prototype I2 checks for one conversational prompt-completion row.
+
+    With check_length=False the word/sentence rules are skipped. That is
+    only for train_nodistill.jsonl, whose targets are verbatim human
+    answers: their length is data, not a defect. Every other check
+    (structure, citations, canary, exact abstention) still applies.
+    """
     errors: list[str] = []
     meta = row.get("meta")
     if not isinstance(meta, Mapping):
@@ -608,18 +614,19 @@ def validate_trl_row(row: Mapping[str, object]) -> list[str]:
         errors.append("abstention target is not exact")
 
     if target:
-        words = target.split()
-        if len(words) > 90:
-            errors.append(f"answer has {len(words)} words (max 90)")
-        sentences = sentence_count(target)
-        if not 1 <= sentences <= 3:
-            errors.append(f"answer has {sentences} sentences (expected 1-3)")
+        if check_length:
+            words = target.split()
+            if len(words) > 90:
+                errors.append(f"answer has {len(words)} words (max 90)")
+            sentences = sentence_count(target)
+            if not 1 <= sentences <= 3:
+                errors.append(f"answer has {sentences} sentences (expected 1-3)")
         if not cited:
             errors.append("answered target has no citation")
     return errors
 
 
-def i2_stats(path: str | Path) -> dict[str, object]:
+def i2_stats(path: str | Path, *, check_length: bool = True) -> dict[str, object]:
     total = valid = 0
     errors: list[str] = []
     with Path(path).open(encoding="utf-8") as handle:
@@ -632,7 +639,7 @@ def i2_stats(path: str | Path) -> dict[str, object]:
             except json.JSONDecodeError as exc:
                 errors.append(f"line {line_number}: invalid JSON: {exc}")
                 continue
-            row_errors = validate_trl_row(row)
+            row_errors = validate_trl_row(row, check_length=check_length)
             if row_errors:
                 errors.append(f"line {line_number}: {row_errors[0]}")
             else:

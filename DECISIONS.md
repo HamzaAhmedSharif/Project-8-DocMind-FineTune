@@ -293,3 +293,22 @@ of script 3.1 open the F0 section, with their evidence.
   train, double the dev/test rate), so the script's expected p0 of
   0.10-0.12 does not apply to this data. Expected train.jsonl ~1,400
   with abstention share ~20%.
+
+### Decision: I2 length exception for verbatim human targets (F1.4)
+
+- Context: build_train.py's I2 gate (valid share >= 0.99) failed on
+  train_nodistill.jsonl at 0.9834 (24/1,444 invalid). All 24 failures
+  were word/sentence-rule violations on verbatim human answers (up to
+  223 words, up to 5 sentences) - the length is the data, not a defect.
+  The distilled file passed at 0.9903 and data25 at 0.9945.
+- Chosen (Hamza, 2026-11-20): validate_trl_row / i2_stats take
+  check_length=False for the nodistill file only; the word/sentence
+  rules are skipped there, while structure, citation, canary and
+  exact-abstention checks still apply. The 0.99 gate itself is
+  unchanged. After the fix: train 0.9903, nodistill 1.0, data25 0.9945.
+- Note: the teacher filter V1 does not check sentence count, so 14
+  distilled targets have 4-6 sentences. They sit inside the 1%
+  tolerance (train passes at 0.9903); no action.
+- Result: train.jsonl 1,444 rows (1,171 distilled + 273 abstentions),
+  gold pass rate 55.8%, abstention share 18.9% (target 20% +/- 3%).
+  Below the 1,500-row target - recorded deviation, not a gate failure.

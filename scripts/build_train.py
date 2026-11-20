@@ -101,7 +101,12 @@ def main() -> int:
         "train_nodistill": option_a,
         "train_data25": data25,
     }
-    i2 = {name: i2_stats(path) for name, path in files.items()}
+    # train_nodistill.jsonl holds verbatim human answers, so the I2
+    # word/sentence rules do not apply to it (DECISIONS.md, F1.4).
+    i2 = {
+        name: i2_stats(path, check_length=(name != "train_nodistill"))
+        for name, path in files.items()
+    }
     i2_share = {name: stats["i2_valid_share"] for name, stats in i2.items()}
 
     meta_rows = [row["meta"] for row in distilled]
