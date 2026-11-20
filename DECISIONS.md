@@ -335,3 +335,11 @@ of script 3.1 open the F0 section, with their evidence.
 - Final verifier: 96/96 passed, retrievable 68/84 (up from 66 after the two question edits); 16 answerable items remain unretrievable and are kept per §3.6.
 - Freeze: SHA-256 of holdout_questions.jsonl recorded in evaluation/gates.json meta.holdout_sha256 (43b7637e2841b81eef50e8745b7275f2abeadaec5af975c3423e631a5be6a8b3). The F1.5c root gates.json was a duplicate in the wrong location (Sol's prompt said "repo root") and was deleted; evaluation/gates.json is the canonical gate file. meta.frozen_at stays null until the F2.7 full freeze.
 - Spotcheck sheet: reports/holdout-spotcheck.md (10 items, seed 20261207) for [H5].
+
+### Note: Frozen contexts built and verified reproducible (F1.6)
+
+- PAPER16 vendored: evaluation/paper16/questions.py copied from P7 (exactly the 16 ids d01-d12 + a01-a04; the 4 web questions excluded); field-by-field comparison against the P7 original: 0 diffs. Transformer paper attention.pdf hash-verified against the P7 corpus manifest (bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697); extracted to B:\p8\data\paper16\attention.pages.json (15 pages, 39,600 chars).
+- Contexts (evaluation/contexts/): contexts_qdev 200 rows (sha256 1e6a9acecb34900e46d62db27a5e10bb9bc9daf1eb45a14a44b0e7ffe9718ead), contexts_qtest 400 (867228f1d345327cb0d77cfdaafc955b0f9a24bd748895f144d1ea3b61948bac), contexts_hold 96 (4e51514b0b1dabace57b04a3b114eaf6b9abeca95b616f777624bd12377ce044), contexts_paper16 16 (d5ac1fe4a34af4f2478bdcea690d686a7607e7846d77f6c5e10574312be505d1). Plain top-10 cosine within the question's own paper, no gold insertion; chunk texts not stored (re-derived from paper text).
+- Short papers: 1 Q-DEV row has 5 chunks and 10 Q-TEST rows have 5/8/9 chunks (papers with fewer than 10 chunks) — expected, not a defect.
+- Reproducibility: the build was run twice by OpenCode and once more by Sol — all three runs byte-for-byte identical (same four hashes). Hashes recorded in reports/hashes.json (git-ignored) and here.
+- pyproject.toml: evaluation/paper16/questions.py added to ruff's exclude list so the vendored file is never reformatted (same treatment as docmind_ft/vendor).
