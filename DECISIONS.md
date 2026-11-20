@@ -326,3 +326,12 @@ of script 3.1 open the F0 section, with their evidence.
 - Verification (Sol): re-ran scripts/verify_holdout.py herself - 96/96 passed, 0 failed, retrievable 66. Read 36 items in full (all 12 unanswerables, all 24 friction-paper items, a seeded 12-item sample): questions self-contained, gold answers sound, accept patterns cover real paraphrases (en-dash/hyphen, Greek-letter spellings, number formats). The PICO expansion question (h13) was checked against the paper text: the paper itself uses "Comparator", so the gold answer is correct.
 - Retrievable: 66 of 84 answerable questions have a key fact in the retrieved top-10; the 18 unretrievable are KEPT per section 3.6 (the set must not tilt toward easy retrieval). The groundable ceiling (section 3.8) will reflect this at evaluation time.
 - Known nits for the F1.5c fix round: h92 ("Which framework optimizes the hyperparameters?") and h88 ("Which dataset is used for comprehensive evaluation?") have no topic hint; add one to each question.
+
+### Note: HOLD second pass complete; HOLD frozen (F1.5c)
+
+- Second pass (local qwen3:8b, evidence text only, 84 answerable items): 14 flagged; 13 fixed by adding accept patterns (model answered correctly, phrasing unmatched); 1 kept as "model error, kept" (h70: model answered Kendall tau = 0.667; the paper states Spearman rho = 0.853 for the asked metric, gold correct — verified against the paper text); 0 removed.
+- Topic-hint edits (not flagged): h88 ("...of the proposed framework"), h92 ("...of the SSI-GAN model").
+- One detail caught in the v1-vs-v2 diff (not in the session report): h65's old pattern (scale of 1 to 4) was removed when the replacement (1 to 4) was added — correct, the old one was broken by bold markup in the model answer.
+- Final verifier: 96/96 passed, retrievable 68/84 (up from 66 after the two question edits); 16 answerable items remain unretrievable and are kept per §3.6.
+- Freeze: SHA-256 of holdout_questions.jsonl recorded in evaluation/gates.json meta.holdout_sha256 (43b7637e2841b81eef50e8745b7275f2abeadaec5af975c3423e631a5be6a8b3). The F1.5c root gates.json was a duplicate in the wrong location (Sol's prompt said "repo root") and was deleted; evaluation/gates.json is the canonical gate file. meta.frozen_at stays null until the F2.7 full freeze.
+- Spotcheck sheet: reports/holdout-spotcheck.md (10 items, seed 20261207) for [H5].
