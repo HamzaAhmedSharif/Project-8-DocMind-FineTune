@@ -351,3 +351,70 @@ of script 3.1 open the F0 section, with their evidence.
 - DATA.md finalized (train files, HOLD, PAPER16 + contexts with hashes, I1 result).
 - CI fix by Sol (verification): the leakage smoke test and the PAPER16 contexts test read laptop data files with no skip guard and would have failed on the CI runner. Guards added in the F1.4-established style (skip when the artifacts are absent); verified to trigger on missing data and to pass with data present. Full suite: 145 tests pass, ruff clean.
 - F1 verdict: PASS (reports/F1-verdict.md). [H5] requested.
+
+### Note: F2.1 generation harness and metrics implemented (F2.1)
+
+- Files: `docmind_ft/generate.py`, `docmind_ft/metrics.py`,
+  `scripts/run_eval.py`, `scripts/compute_metrics.py`,
+  `tests/test_generate.py`, `tests/test_metrics.py`.
+- Harness: `dev` reads `contexts_qdev.jsonl`, `qtest`/`hold`/`paper16`
+  read their frozen files; p7-v3 prompt via the vendored
+  `build_prompt_v3`; canary `P8-<12 hex>` from `random.Random(20261207)`
+  consumed once per context row, so a resumed run keeps the stream
+  aligned; greedy decoding, `max_new_tokens=200`, batch 1 for `hf` and
+  `ollama`. Rows are append-only and store canary, seed, model/base id,
+  revision, adapter SHA-256, token counts and seconds; the prompt is not
+  stored (it is re-derivable, and HOLD/PAPER16 paper text must not be
+  redistributed).
+  The provider backend keeps the vendored P7 adapter's completion limit
+  (1024) and records it as the effective `max_new_tokens`; R is scored
+  from one sample, as section 3.10 states.
+- I7: a test split needs `DOCMIND_FT_ALLOW_TEST=1`, a model in
+  {B0, B1, FT-main, FT-nodistill, FT-r64, FT-data25, R}, and no earlier
+  ledger line for the same (model, split). R is allowed only on HOLD and
+  PAPER16; PAPER16 allows only R; the service-path split
+  `PAPER16-service` belongs to F6 and is not a harness split. The ledger
+  line is appended only after a run completes, so resuming an interrupted
+  run is allowed; a second completed run is refused.
+- Metrics: SQuAD normalization reuses the vendored `clean`; yes/no uses
+  the output's first word; only `[cN]` markers are removed before text
+  scoring (other brackets stay); `[c1, c2]` is unrecognized; HOLD accept
+  patterns run on lowercase/collapsed whitespace with the strict
+  verbatim share beside them; PAPER16 reuses the vendored
+  `score_key_facts`; groundability and bleed use the concatenated
+  retrieved context; bootstrap resamples papers (10,000, seed 20261207).
+- Scoring join: the prompt numbers chunks `c1..cN` in context order, so
+  `scripts/compute_metrics.py` maps gold raw chunk ids to those short ids
+  before `citation_support`/`gold_recall`; an output id outside the split
+  fails instead of silently scoring zero rows.
+- Verification: 226 tests pass; `ruff check` and `ruff format --check`
+  clean; a fake-backend smoke run on 5 frozen Q-DEV rows produced the
+  full metric set. No model was run and no test split was generated;
+  [H3] still blocks F2.2.
+
+### Note: F2.1 verified by Sol; harness + metrics PASS (F2.1)
+
+- Full reads: `docmind_ft/generate.py`, `docmind_ft/metrics.py`,
+  `scripts/run_eval.py`, `scripts/compute_metrics.py`,
+  `tests/test_metrics.py` (60), `tests/test_generate.py` (21).
+  I7 guard, seeded canary stream (aligned on resume), append-only
+  resume, 14-field rows with no prompt field, three backends
+  (hf greedy/200 tokens/batch 1, ollama temp 0, provider vendored
+  limit 1024), section 3.8 metrics incl. paper-cluster bootstrap
+  (10,000 resamples) - all sound.
+- Sol's own runs: pytest 226 passed, ruff check + format clean
+  (52 files). CI simulation in a venv with only requirements-ci.txt
+  (B:\p8\ci-venv): 225 passed + 1 skipped (fastembed alignment
+  test, by design) - the unpushed batch is CI-safe. End-to-end
+  smoke (fake backend, 5 real Q-DEV rows, real resolver + metrics
+  join) produced the full metric set.
+- Chunk resolution: all 7,087 frozen-context references resolve to
+  text through the real resolver (0 failed); question loaders return
+  5049/5049/96/16. The session report's "6,956 chunks" is wrong;
+  7,087 is the reference count (5,638 distinct ids).
+- Corrected the session note above: 223 tests -> 226 tests.
+- Nit (pinned by test, negligible): `format_valid` counts `[cN]`
+  markers as words toward the 120-word limit, while
+  `mean_answer_length` strips them. Real answers are ~40 words.
+- No ledger file exists; no test split was generated. Peak-VRAM
+  capture and I4 determinism still wait on [H3] (base model).
