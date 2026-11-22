@@ -1,0 +1,24 @@
+{
+  "model": "openai/gpt-oss-120b",
+  "base_url": "https://api.groq.com/openai/v1",
+  "reasoning_effort": "low",
+  "probed_at_utc": "2026-11-22T22:36:48.750418+00:00",
+  "probe_reply": "",
+  "probe_prompt_tokens": 78,
+  "probe_completion_tokens": 16,
+  "rate_limit_headers": {
+    "x-ratelimit-limit-requests": "1000",
+    "x-ratelimit-limit-tokens": "8000",
+    "x-ratelimit-remaining-requests": "999",
+    "x-ratelimit-remaining-tokens": "7906",
+    "x-ratelimit-reset-requests": "1m26.4s",
+    "x-ratelimit-reset-tokens": "705ms"
+  },
+  "provider_requests_used_so_far": 1,
+  "budget": {
+    "total_cap": 150,
+    "per_utc_day_cap": 60,
+    "reference_requests_planned": 112,
+    "days_needed": 2
+  }
+}

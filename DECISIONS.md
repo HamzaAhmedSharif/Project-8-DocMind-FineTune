@@ -450,3 +450,19 @@ of script 3.1 open the F0 section, with their evidence.
   by py-spy (process was mid-generation, healthy).
 - I4 determinism and the formal peak-VRAM capture are still pending
   (deferred to after the F2.6 B0 sealed runs).
+
+### Note: Provider limits probed (F2.4)
+
+- One tiny Groq call through the vendored adapter (openai/gpt-oss-120b,
+  reasoning low): the key loads from .env and the call succeeded.
+  Rate-limit headers: 1,000 requests/day (999 remaining), 8,000
+  tokens/min (7,906 remaining). Our P8 budget (60/UTC day) binds, not
+  Groq's limits. Recorded in evaluation/results/provider-limits.json.
+- The probe reply was empty: max_completion_tokens=16 was consumed by
+  reasoning tokens. Real F2.5 calls use the vendored 1024 cap, so this
+  is a probe artifact, not a provider problem.
+- Pacing: vendored buckets hosted_rpm=20, hosted_tpm=8000 (90%
+  effective). F2.5's ~2,300-token prompts estimate ~3,600 tokens each,
+  so ~2 calls/min steady-state; 112 reference calls take about an hour
+  of wall time, split 60 + 52 across two UTC days.
+- Provider budget used: 1/150 (this probe).
