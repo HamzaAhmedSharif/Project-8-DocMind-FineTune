@@ -418,3 +418,35 @@ of script 3.1 open the F0 section, with their evidence.
   `mean_answer_length` strips them. Real answers are ~40 words.
 - No ledger file exists; no test split was generated. Peak-VRAM
   capture and I4 determinism still wait on [H3] (base model).
+
+### Note: B0 baseline on Q-DEV complete (F2.2)
+
+- B0 (Llama 3.2 3B Instruct, 4-bit NF4, P7 prompt as-is) on Q-DEV (200
+  questions): answer_f1 0.185 (extractive 0.199, free_form 0.124, yes_no
+  0.192), format_valid 0.32, citation_valid_share 0.735,
+  answers_with_valid_citation 0.573, citation_support 0.302, abstain_acc
+  0.25 (3/12 unanswerable), over_refusal 0.111, gold_recall 0.814,
+  mean_answer_length 91.85 words, generated_tokens_mean 135.9,
+  seconds_p50 16.48, tokens_per_second 7.57. Outputs:
+  evaluation/results/b0_dev.jsonl (sha256
+  400d3dd95470f95987df1e31a5acd1019f639018544e2f0d5261cc897bd43fbe) and
+  evaluation/results/metrics_b0_dev.json.
+- Deviation from the script: outputs live under evaluation/results/
+  (the harness convention) instead of evaluation/baselines/b0_dev.json.
+  run_eval.py writes JSONL and compute_metrics.py reads from
+  evaluation/results/; the script's path is superseded.
+- Run history: job f2-b0-dev wrote 58 rows, stopped 04:30 on Hamza's
+  instruction; resumed as f2-b0-dev2, wrote the remaining 142, .done
+  06:29 (questions 200, written 142, skipped 58). The harness resume is
+  verified working (skip is O(1), no regeneration of finished ids).
+- Power: the run was ~1 row/min under the Balanced scheme (GPU capped
+  at ~15 W); switching to High performance via powercfg /setactive
+  (worked non-elevated over SSH) raised draw to ~47 W and the rate to
+  ~10 rows/min. Sleep-Never set on AC for overnight runs. Peak VRAM
+  observed 7,937 MiB of 8,188.
+- The resumed load took ~20 min vs ~10 min for the first load (busier
+  laptop: Chrome, VS Code); observation only, not a defect. A 25-min
+  "no new rows" scare during the resume was the slow load, confirmed
+  by py-spy (process was mid-generation, healthy).
+- I4 determinism and the formal peak-VRAM capture are still pending
+  (deferred to after the F2.6 B0 sealed runs).
