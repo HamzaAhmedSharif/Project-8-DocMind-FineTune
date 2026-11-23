@@ -59,8 +59,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--adapter", type=Path, default=None)
     parser.add_argument("--merged-bf16", action="store_true")
     parser.add_argument("--host", default=None, help="Ollama host URL")
+    parser.add_argument(
+        "--prompt-file",
+        type=Path,
+        default=None,
+        help="prompt template with {canary}, {context_blocks}, {question} (default: p7-v3)",
+    )
     args = parser.parse_args(argv)
 
+    if args.prompt_file is not None and not args.prompt_file.is_file():
+        print(f"error: prompt file not found: {args.prompt_file}", file=sys.stderr)
+        return 2
     if args.split in TEST_SPLITS and not Settings.from_env().docmind_ft_allow_test:
         print(
             f"refusing split {args.split!r}: DOCMIND_FT_ALLOW_TEST=1 is required",
@@ -78,6 +87,7 @@ def main(argv: list[str] | None = None) -> int:
         model=args.model,
         backend=_backend(args),
         out_path=args.out,
+        prompt_file=args.prompt_file,
     )
     print(
         json.dumps(

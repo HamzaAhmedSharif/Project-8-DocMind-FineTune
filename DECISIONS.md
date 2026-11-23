@@ -521,3 +521,21 @@ of script 3.1 open the F0 section, with their evidence.
 - Formal peak VRAM during the I4 runs: 7,925 MiB of 8,188 (10s
   nvidia-smi polling). Consistent with the 7,937 MiB observed
   informally during F2.2.
+
+### Note: F2.3 prompt-override harness verified; B1 v1 drafted (F2.3)
+
+- Harness change (OpenCode, verified by Sol): docmind_ft/prompts.py
+  renders variant templates ({canary}, {context_blocks}, {question})
+  with the vendored sanitize_context; run_generation() takes an
+  optional prompt_file (missing file raises before any output is
+  written); run_eval.py gains --prompt-file (missing file exits 2).
+  Default path proven byte-identical to build_prompt_v3 by test.
+- B1 v1 (evaluation/baselines/b1_v1.txt): p7-v3 rules + completeness
+  plus stricter format instructions only (1-3 sentences, <=90 words,
+  cite every claim, <=25-word quotes, answer text only). No
+  abstention sentence yet (iteration 2), no exemplar (iteration 3).
+- Nit, not blocking: the variant blocks add <<<end cN>>> closers
+  that the vendored builder does not emit, so they are not
+  p7-v3-identical as first reported. Harmless delimiters; B1 is a
+  different prompt by design, and no metric reads prompt closers.
+- Verified: 233 passed, ruff check + format clean (54 files).

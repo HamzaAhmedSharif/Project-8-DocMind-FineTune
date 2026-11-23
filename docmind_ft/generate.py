@@ -6,10 +6,11 @@ optional LoRA adapter, or a merged bf16 model), ``ollama`` (the
 OpenAI-compatible endpoint) and ``provider`` (the vendored hosted adapter).
 
 Every run reads a frozen ``evaluation/contexts/contexts_<set>.jsonl`` file,
-renders the vendored p7-v3 prompt with a fresh seeded canary per question,
-generates greedily (``do_sample=False``, 200 new tokens, batch size 1), and
-appends one JSON line per question.  Finished question ids are skipped, so an
-interrupted run resumes without re-sampling.  Test splits are guarded by gate
+renders the vendored p7-v3 prompt (or a supplied variant template) with a
+fresh seeded canary per question, generates greedily (``do_sample=False``,
+200 new tokens, batch size 1), and appends one JSON line per question.
+Finished question ids are skipped, so an interrupted run resumes without
+re-sampling.  Test splits are guarded by gate
 I7 (``DOCMIND_FT_ALLOW_TEST=1`` + a pre-declared model + one ledger line per
 model/split pair).
 """
@@ -38,6 +39,7 @@ from docmind_ft.contexts import (  # noqa: E402
     _load_paper16_questions,
     load_work_questions,
 )
+from docmind_ft.prompts import build_prompt_variant  # noqa: E402
 from docmind_ft.vendor.chunking import chunk_pages  # noqa: E402
 from docmind_service.domain import RetrievedChunk  # noqa: E402
 from docmind_service.guardrails import build_prompt_v3  # noqa: E402
@@ -274,6 +276,7 @@ def run_generation(
     contexts_path: Path | None = None,
     question_texts: Mapping[str, str] | None = None,
     chunk_texts: Mapping[str, str] | None = None,
+    prompt_file: str | Path | None = None,
     ledger_path: Path | None = None,
     seed: int = SEED,
     max_new_tokens: int = MAX_NEW_TOKENS,
@@ -283,6 +286,8 @@ def run_generation(
     if split not in SPLITS:
         raise ValueError(f"unknown split: {split!r}")
     check_test_guard(model, split, ledger_path=ledger_path, allow_test=allow_test)
+    if prompt_file is not None and not Path(prompt_file).is_file():
+        raise FileNotFoundError(f"prompt file not found: {prompt_file}")
 
     contexts = _read_jsonl(contexts_path or SPLIT_CONTEXTS[split])
     questions = (
@@ -316,7 +321,10 @@ def run_generation(
             question = questions[question_id]
             paper_id = str(context["paper_id"])
             chunks = _build_chunks(context, paper_id, resolver, split)
-            prompt, _ = build_prompt_v3(question, chunks, canary)
+            if prompt_file is None:
+                prompt, _ = build_prompt_v3(question, chunks, canary)
+            else:
+                prompt = build_prompt_variant(prompt_file, question, chunks, canary)
             started = time.perf_counter()
             generated = backend.generate(prompt)
             seconds = time.perf_counter() - started

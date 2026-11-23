@@ -1,3 +1,4 @@
+# ruff: noqa: I001  # import order is load-bearing: docmind_ft.vendor installs the alias
 """Tests for the F2.1 generation harness (no GPU, no network).
 
 Backends are faked; contexts, question texts and chunk texts are small
@@ -11,6 +12,7 @@ import importlib.util
 import json
 import re
 from pathlib import Path
+from uuid import NAMESPACE_URL, uuid5
 
 import pytest
 
@@ -24,6 +26,8 @@ from docmind_ft.generate import (
 from docmind_ft.generate import (
     TestGuardError as GuardError,
 )
+from docmind_service.domain import RetrievedChunk
+from docmind_service.guardrails import build_prompt_v3
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -256,6 +260,37 @@ def test_prompt_uses_vendored_builder_and_canary(tmp_path):
     assert "Question: What is alpha?" in prompt
 
 
+def test_prompt_file_overrides_the_default_builder(tmp_path):
+    template = tmp_path / "variant.txt"
+    template.write_text(
+        "VARIANT {canary}\n\n{context_blocks}\n\nQuestion: {question}\n\nAnswer:",
+        encoding="utf-8",
+        newline="\n",
+    )
+    backend = FakeBackend()
+    summary = _run(tmp_path, backend=backend, prompt_file=template)
+    rows = _read_jsonl(summary.output_path)
+    prompt = backend.prompts[0]
+    assert prompt.startswith(f"VARIANT {rows[0]['canary']}")
+    assert "<<<c1 page=3>>>\nAlpha is the first letter.\n<<<end c1>>>" in prompt
+    assert "Question: What is alpha?" in prompt
+
+
+def test_default_prompt_matches_the_vendored_builder(tmp_path):
+    backend = FakeBackend()
+    summary = _run(tmp_path, backend=backend)
+    row = _read_jsonl(summary.output_path)[0]
+    chunk = RetrievedChunk(
+        chunk_id="p1:0",
+        document_id=uuid5(NAMESPACE_URL, "p1"),
+        page=3,
+        text="Alpha is the first letter.",
+        score=0.9,
+    )
+    expected, _ = build_prompt_v3("What is alpha?", [chunk], row["canary"])
+    assert backend.prompts[0] == expected
+
+
 def test_missing_question_text_fails_before_writing(tmp_path):
     with pytest.raises(ValueError, match="no question text"):
         _run(tmp_path, question_texts={"q1": "What is alpha?"})
@@ -304,6 +339,27 @@ def test_run_eval_cli_refuses_a_test_split_without_env(tmp_path, monkeypatch):
     )
     assert code == 2
     assert not (tmp_path / "out.jsonl").exists()
+
+
+def test_run_eval_cli_refuses_a_missing_prompt_file(tmp_path):
+    module = _load_script("run_eval")
+    out_path = tmp_path / "out.jsonl"
+    code = module.main(
+        [
+            "--model",
+            "B0",
+            "--split",
+            "dev",
+            "--backend",
+            "hf",
+            "--out",
+            str(out_path),
+            "--prompt-file",
+            str(tmp_path / "missing.txt"),
+        ]
+    )
+    assert code == 2
+    assert not out_path.exists()
 
 
 def test_compute_metrics_cli_refuses_a_test_split_without_env(monkeypatch):
