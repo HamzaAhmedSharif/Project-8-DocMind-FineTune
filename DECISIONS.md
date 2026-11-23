@@ -510,3 +510,14 @@ of script 3.1 open the F0 section, with their evidence.
 - B1's three sealed runs wait for F2.3 (prompt-override harness
   change, OpenCode step, needs Hamza awake). R HOLD is 63/96,
   blocked on Groq's 200k tokens/day limit until ~07:30 CST Nov 24.
+
+### Note: I4 determinism passes; peak VRAM captured (F2)
+
+- I4: the first 100 Q-DEV questions run twice with B0 (greedy, one
+  loaded model). Identical outputs 100/100 (share 1.0). The two
+  metrics files differ only in the output path and wall-clock timing
+  (seconds_p50 15.09 vs 15.08); every content metric is identical.
+  I4 PASSES.
+- Formal peak VRAM during the I4 runs: 7,925 MiB of 8,188 (10s
+  nvidia-smi polling). Consistent with the 7,937 MiB observed
+  informally during F2.2.
