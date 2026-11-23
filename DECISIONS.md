@@ -551,3 +551,13 @@ of script 3.1 open the F0 section, with their evidence.
   the exact abstention sentence + when to use it (script F2.3, second
   allowed edit). Iterations recorded in
   evaluation/baselines/b1_iterations.json.
+
+### Note: B1 iteration 2 on Q-DEV (F2.3)
+
+- B1 v2 (v1 + exact abstention sentence): answer_f1 0.2658 (v1:
+  0.2694), format_valid 0.82 (v1: 0.84), citation_support 0.4586,
+  abstain_acc 0.167 (2/12; v1: 1/12). Outputs sha256 14d2659d.
+- Selection so far: v1 and v2 tie on answer_f1 (diff 0.0036, within
+  the 0.01 band), so format_valid decides — v1 leads. Iteration 3
+  (last allowed) adds one compact invented exemplar (Marisol coral
+  survey, fictional) demonstrating a cited answer.
