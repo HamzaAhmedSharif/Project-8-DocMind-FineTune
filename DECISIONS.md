@@ -501,3 +501,12 @@ of script 3.1 open the F0 section, with their evidence.
   block was removed (4 lines) and the test now asserts B0-on-PAPER16
   is allowed; the R-on-Q-TEST refusal is unchanged and correct.
 - Verified: full suite 226 passed, ruff check + format clean.
+
+### Note: F2.6 B0 sealed runs complete (2026-11-23)
+
+- B0 Q-TEST 400/400 (sha256 9849ca13), B0 HOLD 96/96 (sha256
+  1469c336), B0 PAPER16 16/16 (sha256 128a5d2c). All three ledger
+  lines written. No metrics computed on any test split (sealed).
+- B1's three sealed runs wait for F2.3 (prompt-override harness
+  change, OpenCode step, needs Hamza awake). R HOLD is 63/96,
+  blocked on Groq's 200k tokens/day limit until ~07:30 CST Nov 24.
