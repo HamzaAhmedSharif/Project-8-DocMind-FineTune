@@ -149,8 +149,8 @@ def test_guard_rejects_models_outside_their_predeclared_splits(tmp_path, monkeyp
     ledger = tmp_path / "ledger.jsonl"
     with pytest.raises(GuardError, match="not pre-declared for 'qtest'"):
         check_test_guard("R", "qtest", ledger_path=ledger)
-    with pytest.raises(GuardError, match="not pre-declared for 'paper16'"):
-        check_test_guard("B0", "paper16", ledger_path=ledger)
+    # Script sections 3.10/F2.6: B0 and B1 run on PAPER16; only R is split-restricted.
+    check_test_guard("B0", "paper16", ledger_path=ledger)
     check_test_guard("R", "paper16", ledger_path=ledger)
 
 

@@ -490,3 +490,14 @@ of script 3.1 open the F0 section, with their evidence.
   small for a sustained sweep against the 7,200/min token bucket —
   PAPER16 died on the 4th call; set DOCMIND_LLM_MAX_WAIT_SECONDS=180
   in the provider wrappers (config only, vendored code untouched).
+
+### Note: I7 guard corrected — B0/B1 run on PAPER16 (F2.6)
+
+- The F2.1 harness refused non-R models on PAPER16. That restriction
+  has no basis in the script: section 3.10 declares B0 and B1 without
+  a split restriction (only R is restricted, to HOLD and PAPER16), F2.6
+  runs B0 and B1 on Q-TEST, HOLD and PAPER16, and the F2.8 freeze check
+  expects ledger lines for B0 and B1 on all three sets. The guard
+  block was removed (4 lines) and the test now asserts B0-on-PAPER16
+  is allowed; the R-on-Q-TEST refusal is unchanged and correct.
+- Verified: full suite 226 passed, ruff check + format clean.

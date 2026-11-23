@@ -153,10 +153,8 @@ def check_test_guard(
         raise TestGuardError(f"refusing a test-split run: model {model!r} is not pre-declared")
     if split == "qtest" and model == "R":
         raise TestGuardError("refusing a test-split run: R is not pre-declared for 'qtest'")
-    if split == "paper16" and model != "R":
-        raise TestGuardError(
-            f"refusing a test-split run: {model!r} is not pre-declared for 'paper16'"
-        )
+    # R is the only split-restricted model (script 3.10: R on HOLD and
+    # PAPER16 only); B0, B1 and the FT-* models run on all test splits.
     for entry in _read_jsonl(ledger_path or LEDGER_PATH):
         if entry.get("model") == model and entry.get("split") == split:
             raise TestGuardError(f"refusing a second test-split run for {model!r} on {split!r}")
