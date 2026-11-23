@@ -466,3 +466,27 @@ of script 3.1 open the F0 section, with their evidence.
   so ~2 calls/min steady-state; 112 reference calls take about an hour
   of wall time, split 60 + 52 across two UTC days.
 - Provider budget used: 1/150 (this probe).
+
+### Note: F2.5/F2.6 sealed runs in progress (partial, 2026-11-23)
+
+- F2.6 B0 Q-TEST complete: 400/400 rows, sha256
+  9849ca13538a8e868491223ee83d869447970acb642b14406a07f4357b628786,
+  ledger line written. No metrics computed (sealed until F5).
+- F2.5 R PAPER16 complete: 16/16 rows, sha256
+  30057754395d18ce123720f9031f7e18ca1459a626157e8e71dcad0f999a10c3,
+  ledger line written.
+- F2.5 R HOLD partial: 59/96 rows (batch 1: 38, batch 2: 21). Batch 2
+  failed 08:13 on Groq's 200,000 tokens/day limit (Used 199,240) — a
+  limit the F2.4 probe headers do not show. The vendored adapter raised
+  "provider daily limit reached" cleanly, no blind retry. Resume when
+  tokens free up (rolling 24h window); one retry only on UTC 2026-11-23
+  (per-day budget: 22 used, 37 rows remain, 1 spare).
+- Provider budget used: 77/150 total (probe 1, PAPER16 16, HOLD 59,
+  one 429). UTC 2026-11-22: 55/60. UTC 2026-11-23: 22/60 so far.
+- Two wrapper fixes this session: (1) `cd /d` is cmd syntax and fails
+  in PowerShell — the first F2.6 Q-TEST and F2.5 PAPER16 launches died
+  at startup; plain `cd "path"` works (recorded in AGENTS.md).
+  (2) The vendored adapter's llm_max_wait_seconds default (20s) is too
+  small for a sustained sweep against the 7,200/min token bucket —
+  PAPER16 died on the 4th call; set DOCMIND_LLM_MAX_WAIT_SECONDS=180
+  in the provider wrappers (config only, vendored code untouched).
