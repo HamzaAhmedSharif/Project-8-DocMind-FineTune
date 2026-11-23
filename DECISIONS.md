@@ -561,3 +561,25 @@ of script 3.1 open the F0 section, with their evidence.
   the 0.01 band), so format_valid decides — v1 leads. Iteration 3
   (last allowed) adds one compact invented exemplar (Marisol coral
   survey, fictional) demonstrating a cited answer.
+
+### Note: B1 iteration 3 + frozen B1 prompt (F2.3 complete)
+
+- B1 v3 (v2 + one invented exemplar, last allowed edit): answer_f1
+  0.2712, format_valid 0.895, citation_valid_share 0.936,
+  citation_support 0.411, abstain_acc 0.167 (2/12), mean answer
+  length 31.9 words. Outputs sha256 fc4c520b, 200/200 rows.
+- Selection (script rule: highest Q-DEV answer_f1, tie within 0.01
+  -> higher format_valid): all three iterations tie on answer_f1
+  (v3 0.2712, v1 0.2694, v2 0.2658); v3 wins the tie-break on
+  format_valid (0.895) and is also highest outright. v3 is the
+  frozen B1 prompt, copied byte-identical to
+  evaluation/baselines/b1_frozen.txt (sha256 f8ca1d4a).
+- Note: citation_support dipped in v3 (0.41 vs v2 0.46) while
+  citation validity rose — the exemplar made citations more
+  frequent and well-formed but slightly less often supporting.
+  Abstention stays weak (2/12) across all iterations; prompting
+  alone does not fix it — this is the fine-tuning target.
+- First v3 launch (f2-b1-dev-v3, 02:10) failed in 60 s: Bodycam
+  held 5.6 GB of GPU, model load OOM'd, 0 rows. Relaunched as
+  f2-b1-dev-v3b after the game closed and tunnel wedge #3 cleared
+  (03:13-04:21, ~68 min, proxy layer, laptop IP unchanged).

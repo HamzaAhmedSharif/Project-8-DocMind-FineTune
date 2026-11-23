@@ -1,0 +1,33 @@
+{
+  "split": "dev",
+  "outputs": "evaluation\\results\\b1_dev_v3.jsonl",
+  "n_outputs": 200,
+  "n_expected": 200,
+  "format_valid": 0.895,
+  "citation_valid_share": 0.9361702127659575,
+  "answers_with_valid_citation": 0.9,
+  "citation_support": 0.4111111111111111,
+  "abstain_acc": 0.16666666666666666,
+  "over_refusal": 0.032679738562091505,
+  "n_unanswerable": 12,
+  "n_answerable_with_gold": 153,
+  "gold_recall": 0.8138297872340425,
+  "mean_answer_length": 31.905,
+  "efficiency": {
+    "answers": 200,
+    "seconds_p50": 5.1350505,
+    "seconds_p95": 16.312814200000002,
+    "prompt_tokens_mean": 2465.6,
+    "generated_tokens_mean": 47.87,
+    "tokens_per_second": 7.682275841945227
+  },
+  "answer": {
+    "answer_f1": 0.27117106926603607,
+    "n_scored": 188,
+    "answer_f1_by_type": {
+      "extractive": 0.28833820226304013,
+      "free_form": 0.20647763392347848,
+      "yes_no": 0.27125506072874495
+    }
+  }
+}
