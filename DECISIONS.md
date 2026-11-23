@@ -539,3 +539,15 @@ of script 3.1 open the F0 section, with their evidence.
   p7-v3-identical as first reported. Harmless delimiters; B1 is a
   different prompt by design, and no metric reads prompt closers.
 - Verified: 233 passed, ruff check + format clean (54 files).
+
+### Note: B1 iteration 1 on Q-DEV (F2.3)
+
+- B1 v1 (stricter format instructions only): answer_f1 0.2694 (B0:
+  0.1847), format_valid 0.84 (B0: 0.32), citation_valid_share 0.878,
+  citation_support 0.4505, mean answer length 33.7 words (B0: 91.9).
+  Outputs sha256 2e7cd2ed, 200/200 rows.
+- Weak spot: abstain_acc 0.083 (1/12; B0: 0.25) with over_refusal
+  0.026 — the model now answers nearly everything. Iteration 2 adds
+  the exact abstention sentence + when to use it (script F2.3, second
+  allowed edit). Iterations recorded in
+  evaluation/baselines/b1_iterations.json.
