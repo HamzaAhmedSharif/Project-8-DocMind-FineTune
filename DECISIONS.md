@@ -583,3 +583,17 @@ of script 3.1 open the F0 section, with their evidence.
   held 5.6 GB of GPU, model load OOM'd, 0 rows. Relaunched as
   f2-b1-dev-v3b after the game closed and tunnel wedge #3 cleared
   (03:13-04:21, ~68 min, proxy layer, laptop IP unchanged).
+
+### Note: B1 sealed runs complete (F2.6)
+
+- B1 (frozen v3 prompt) on all three sealed sets, job
+  f2-b1-sealed-b: Q-TEST 400/400 (sha256 67175512), HOLD 96/96
+  (ac8b56a3), PAPER16 16/16 (93a8c718). All three ledgered in
+  reports/test-eval-ledger.jsonl (7 lines total). NO metrics
+  computed — sealed until F5.
+- First launch (f2-b1-sealed) failed in 60 s, exit 2: the wrapper
+  used `--split test` (invalid; the split is `qtest`) and was
+  missing `DOCMIND_FT_ALLOW_TEST=1` (I7 guard). Fixed wrapper
+  re-ran clean. Lesson: copy the B0 sealed wrapper form exactly
+  for test-split runs.
+- Remaining for F2.6: R HOLD 63/96 (resume cron fired 07:30 today).
