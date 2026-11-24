@@ -682,3 +682,17 @@ of script 3.1 open the F0 section, with their evidence.
 - Rejected: hashing the save_pretrained output dir (the files land in the run root, mixed with checkpoints -- fragile to enumerate); hashing the tokenizer object (hash() is not stable across runs).
 - Tradeoff accepted: the hash covers the snapshot files, not the in-memory tokenizer -- the two are identical by construction (the tokenizer is loaded from that snapshot).
 - Would revisit if: never.
+
+### Decision: I2-invalid dev-loss rows dropped at assembly
+- Context: the first full dev-loss build (2026-11-25 03:40) kept 204 rows but the gate failed at I2 valid share 0.9853 < 0.99: 3 rows had teacher answers of 4-5 sentences (lines 10, 139, 157), breaking the 1-3 sentence rule.
+- Chosen: filter assembled rows with validate_trl_row -- the same function i2_stats uses -- before writing data/dev_loss.jsonl, and record the dropped count in the stats report. The gate still re-verifies the written file independently. Result: 201/201 valid, I2 share 1.0, all six overlaps 0. Evidence: build_dev_loss.py re-runs, 2026-11-25.
+- Rejected: regenerating the 3 answers (more work; the same teacher may repeat the verbosity); lowering the 0.99 threshold (weakens a pre-registered gate for 3 rows).
+- Tradeoff accepted: 201 rows instead of 204; the set is a training diagnostic, so the difference is immaterial.
+- Would revisit if: never -- the set is built once from the fixed eligible pool.
+
+### Decision: --force rebuilds the assembled set only, never the teacher output
+- Context: the original --force deleted both data/dev_loss.jsonl AND the teacher-out file (374 rows, ~25 min of local teacher calls), so any rebuild re-taught from scratch. The teacher phase is resumable by design (it skips question_ids already present), so deleting its output defeated the resume.
+- Chosen: --force removes only the assembled data/dev_loss.jsonl; the teacher-out file is kept and reused (zero new teacher calls on rebuild). A full re-teach needs a manual delete of the teacher-out file. Evidence: the 2026-11-25 re-runs printed "nothing to do; all sampled rows are already present".
+- Rejected: keeping the delete-both behavior (wastes ~25 min per rebuild); a separate --rebuild flag (unnecessary once --force is fixed).
+- Tradeoff accepted: a genuinely stale teacher output must be deleted by hand.
+- Would revisit if: never.

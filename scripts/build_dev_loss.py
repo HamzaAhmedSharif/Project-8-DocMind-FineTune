@@ -17,8 +17,10 @@ Pipeline (mirrors scripts/run_teacher_full.py + scripts/build_train.py):
   3. Deterministic seeded sample of 300 A/U questions (seed 20261207).
   4. Run the local Ollama teacher over them (resumable append to
      B:\\p8\\data\\work\\dev_loss_teacher_out.jsonl).
-  5. Assemble TRL rows -> data/dev_loss.jsonl, verify zero overlap with
+  5. Assemble TRL rows, drop any failing the I2 prototype checks (F1.4
+     precedent) -> data/dev_loss.jsonl, verify zero overlap with
      Q-DEV, Q-TEST, and train.jsonl (questions + papers), and report I2 stats.
+     The gate re-verifies the written file independently.
 
     python scripts/build_dev_loss.py [--limit N] [--force] [--dry-run N]
 
@@ -69,6 +71,7 @@ from docmind_ft.teacher_build import (  # noqa: E402
     new_canary,
     process_question,
     summarize_teacher_rows,
+    validate_trl_row,
 )
 
 DEV_QASPER_PATH = QASPER_TRAIN_PATH.parent / "qasper-dev-v0.3.json"
@@ -179,7 +182,12 @@ def _run_teacher(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--limit", type=int, default=None, help="cap the sample size")
-    parser.add_argument("--force", action="store_true", help="rebuild from scratch")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="rebuild the assembled set from the existing teacher output "
+        "(teacher-out is kept, so no new teacher calls)",
+    )
     parser.add_argument(
         "--dry-run",
         type=int,
@@ -194,10 +202,12 @@ def main(argv: list[str] | None = None) -> int:
     p0 = _load_p0()
 
     if args.force:
-        for path in (DEV_TEACHER_OUT_PATH, OUT_PATH):
-            if path.exists():
-                path.unlink()
-                print(f"removed {path}")
+        # Rebuild the assembled set only: the teacher-out file is the
+        # expensive resumable intermediate (~25 min of teacher calls) and is
+        # never deleted by --force. Delete it by hand for a full re-teach.
+        if OUT_PATH.exists():
+            OUT_PATH.unlink()
+            print(f"removed {OUT_PATH}")
     if OUT_PATH.exists() and args.dry_run is None:
         raise SystemExit(f"{OUT_PATH} already exists; pass --force to rebuild it")
 
@@ -257,6 +267,14 @@ def main(argv: list[str] | None = None) -> int:
     answers_by_id = load_train_answers(DEV_QASPER_PATH)
     distilled, _option_a = assemble_trl_rows(rows, sampled_by_id, store, answers_by_id)
     print(f"assembled {len(distilled)} dev-loss rows from {len(rows)} teacher rows")
+    # Drop rows failing the I2 prototype checks (F1.4 precedent: invalid rows
+    # are dropped at assembly, not gated out after the fact). The gate below
+    # still re-verifies the written file independently.
+    kept = [row for row in distilled if not validate_trl_row(row)]
+    dropped = len(distilled) - len(kept)
+    if dropped:
+        print(f"dropped {dropped} rows failing I2 checks; {len(kept)} rows kept")
+    distilled = kept
 
     # --- Overlap verification (questions + papers, all must be zero) ---
     dev_qids = {str(row["meta"]["question_id"]) for row in distilled}
@@ -304,6 +322,7 @@ def main(argv: list[str] | None = None) -> int:
         "teacher_rows": len(rows),
         "teacher_summary": summarize_teacher_rows(rows),
         "kept_rows": len(distilled),
+        "i2_dropped_rows": dropped,
         "overlaps": {name: len(items) for name, items in overlaps.items()},
         "abstention_share": abstention_share(distilled),
         "i2": stats_i2,
