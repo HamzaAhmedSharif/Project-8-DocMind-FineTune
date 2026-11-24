@@ -1,3 +1,2 @@
-# Development-only dependencies (plotting, auditing). Pinned after F0.3.
-matplotlib
+# Development-only dependencies (auditing). Pinned after F0.3.
 pip-audit

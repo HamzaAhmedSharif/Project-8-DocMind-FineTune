@@ -6,12 +6,12 @@ build-backend = "setuptools.build_meta"
 name = "docmind-ft"
 version = "0.1.0"
 description = "QLoRA fine-tune of a small LLM for citation-grounded answering over retrieved text (Project 8, DocMind ecosystem)."
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 
 [tool.ruff]
 line-length = 100
-target-version = "py312"
+target-version = "py310"
 # Vendored files are verbatim P7 copies; linting or formatting them would
 # break the byte-exact vendor check (scripts/check_vendor.py).
 exclude = ["docmind_ft/vendor", "evaluation/paper16/questions.py"]

@@ -37,6 +37,7 @@ from docmind_ft.teacher_build import (
     compute_p0,
     gold_context,
     gold_free_context,
+    i2_failures,
     i2_stats,
     is_data25,
     load_chunk_store,
@@ -45,6 +46,7 @@ from docmind_ft.teacher_build import (
     make_trl_row,
     option_a_target,
     process_question,
+    read_jsonl,
     sentence_count,
     validate_trl_row,
 )
@@ -394,6 +396,23 @@ def test_i2_rejects_each_invalid_case(mutate, needle: str) -> None:
     assert any(needle in error for error in errors)
 
 
+def test_read_jsonl_recovers_a_truncated_final_line(tmp_path, caplog) -> None:
+    path = tmp_path / "rows.jsonl"
+    path.write_text('{"question_id": "q1"}\n{"question_id": "q2"', encoding="utf-8")
+    with caplog.at_level("WARNING", logger="docmind_ft.jsonl"):
+        rows = read_jsonl(path)
+    assert rows == [{"question_id": "q1"}]
+    assert "truncated incomplete final JSONL line" in caplog.text
+    assert path.read_text(encoding="utf-8") == '{"question_id": "q1"}\n'
+
+
+def test_read_jsonl_rejects_a_bad_mid_file_line(tmp_path) -> None:
+    path = tmp_path / "rows.jsonl"
+    path.write_text('{"question_id": "q1"}\nnot-json\n{"question_id": "q2"}\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="invalid JSON"):
+        read_jsonl(path)
+
+
 def test_i2_jsonl_counts_invalid_json(tmp_path) -> None:
     path = tmp_path / "rows.jsonl"
     path.write_text(
@@ -434,6 +453,28 @@ def test_i2_stats_passes_check_length_through(tmp_path) -> None:
     path.write_text(json.dumps(row) + "\n", encoding="utf-8")
     assert i2_stats(path)["valid"] == 0
     assert i2_stats(path, check_length=False)["valid"] == 1
+
+
+def test_i2_empty_file_scores_zero_and_fails_the_row_floor(tmp_path) -> None:
+    path = tmp_path / "empty.jsonl"
+    path.write_text("", encoding="utf-8")
+    stats = i2_stats(path, expected_rows=1)
+    assert stats["rows"] == 0
+    assert stats["i2_valid_share"] == 0.0
+    assert stats["below_expected"] is True
+    assert i2_failures({"train": stats}) == ["train"]
+
+
+def test_i2_all_abstention_file_fails_the_abstention_ceiling(tmp_path) -> None:
+    row = copy.deepcopy(_i2_row())
+    row["completion"][0]["content"] = NO_EVIDENCE_ANSWER
+    path = tmp_path / "abstain.jsonl"
+    path.write_text(json.dumps(row) + "\n" + json.dumps(row) + "\n", encoding="utf-8")
+    stats = i2_stats(path, expected_rows=2)
+    assert stats["i2_valid_share"] == 1.0
+    assert stats["abstention_share"] == 1.0
+    assert stats["below_expected"] is False
+    assert i2_failures({"train": stats}) == ["train"]
 
 
 def test_p0_formula_and_clamp() -> None:

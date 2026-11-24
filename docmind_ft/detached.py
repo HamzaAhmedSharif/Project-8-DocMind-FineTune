@@ -25,8 +25,9 @@ def job_paths(repo_root: str | Path, name: str) -> dict[str, Path]:
 
     Raises ValueError on an invalid name. Layout (script 1.9):
     job output -> <name>.log, heartbeat -> <name>.heartbeat.log,
-    completion markers -> <name>.done / <name>.failed, generated
-    wrapper/launcher -> <name>-wrapper.ps1 / <name>-launcher.vbs.
+    completion markers -> <name>.done / <name>.failed, job arguments ->
+    <name>-args.json, generated wrapper/launcher ->
+    <name>-wrapper.ps1 / <name>-launcher.vbs.
     """
     if not valid_job_name(name):
         raise ValueError(f"invalid job name: {name!r}")
@@ -37,6 +38,7 @@ def job_paths(repo_root: str | Path, name: str) -> dict[str, Path]:
         "heartbeat": logs / f"{name}.heartbeat.log",
         "done": logs / f"{name}.done",
         "failed": logs / f"{name}.failed",
+        "args": logs / f"{name}-args.json",
         "wrapper": logs / f"{name}-wrapper.ps1",
         "launcher": logs / f"{name}-launcher.vbs",
     }

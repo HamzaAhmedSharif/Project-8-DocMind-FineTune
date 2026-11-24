@@ -1,0 +1,38 @@
+{
+  "contexts": {
+    "contexts_hold": {
+      "path": "evaluation/contexts/contexts_hold.jsonl",
+      "sha256": "4e51514b0b1dabace57b04a3b114eaf6b9abeca95b616f777624bd12377ce044"
+    },
+    "contexts_paper16": {
+      "path": "evaluation/contexts/contexts_paper16.jsonl",
+      "sha256": "d5ac1fe4a34af4f2478bdcea690d686a7607e7846d77f6c5e10574312be505d1"
+    },
+    "contexts_qdev": {
+      "path": "evaluation/contexts/contexts_qdev.jsonl",
+      "sha256": "1e6a9acecb34900e46d62db27a5e10bb9bc9daf1eb45a14a44b0e7ffe9718ead"
+    },
+    "contexts_qtest": {
+      "path": "evaluation/contexts/contexts_qtest.jsonl",
+      "sha256": "867228f1d345327cb0d77cfdaafc955b0f9a24bd748895f144d1ea3b61948bac"
+    }
+  },
+  "gates.json": {
+    "frozen_blob_sha256": "bbe104c793416eafb42986080ff308a5cbad27087870dc7c90d31e2d1b9744bf",
+    "path": "evaluation/gates.json"
+  },
+  "splits": {
+    "holdout": {
+      "path": "evaluation/holdout/holdout_questions.jsonl",
+      "sha256": "43b7637e2841b81eef50e8745b7275f2abeadaec5af975c3423e631a5be6a8b3"
+    },
+    "qdev": {
+      "path": "evaluation/splits/qdev.json",
+      "sha256": "82a21e035582d999eb510f37dc6b49ebfbe4de90dd9e5a29ca531b854a259e8c"
+    },
+    "qtest": {
+      "path": "evaluation/splits/qtest.json",
+      "sha256": "4d236746a55c55b05f3e8b5318b1a674a6fa3295747541fa5e65f99e8d2d43e3"
+    }
+  }
+}

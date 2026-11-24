@@ -26,6 +26,7 @@ def test_job_paths_layout(tmp_path: Path) -> None:
     assert paths["heartbeat"] == tmp_path / "reports" / "logs" / "smoke-1.heartbeat.log"
     assert paths["done"] == tmp_path / "reports" / "logs" / "smoke-1.done"
     assert paths["failed"] == tmp_path / "reports" / "logs" / "smoke-1.failed"
+    assert paths["args"] == tmp_path / "reports" / "logs" / "smoke-1-args.json"
     assert paths["wrapper"] == tmp_path / "reports" / "logs" / "smoke-1-wrapper.ps1"
     assert paths["launcher"] == tmp_path / "reports" / "logs" / "smoke-1-launcher.vbs"
 

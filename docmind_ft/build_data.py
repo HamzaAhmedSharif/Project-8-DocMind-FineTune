@@ -12,9 +12,11 @@ Run with ``python -m docmind_ft.build_data``. The full run embeds roughly
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import random
+import sys
 import time
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Sequence
@@ -23,6 +25,7 @@ from pathlib import Path
 
 import numpy as np
 
+from docmind_ft.frozen import FrozenError, ensure_not_frozen
 from docmind_ft.qasper import Paper, Paragraph, Question, load_qasper
 from docmind_ft.retrieval import (
     EMBEDDING_MODEL,
@@ -353,7 +356,20 @@ def _write_split_and_report(
     return question_ids
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="rebuild the frozen Q-DEV/Q-TEST splits",
+    )
+    args = parser.parse_args(argv)
+    try:
+        ensure_not_frozen("the QASPER splits and work data", force=args.force)
+    except FrozenError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
     started = time.perf_counter()
     chunks: list[ChunkData] = []
     questions: list[QuestionData] = []

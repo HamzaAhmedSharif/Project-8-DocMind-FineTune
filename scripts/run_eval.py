@@ -16,6 +16,8 @@ import json
 import sys
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
@@ -23,6 +25,7 @@ if str(REPO_ROOT) not in sys.path:
 import docmind_ft.vendor  # noqa: F401, E402  # installs the docmind_service alias
 
 from docmind_ft.config import Settings  # noqa: E402
+from docmind_ft.frozen import FrozenError, frozen_model_revision  # noqa: E402
 from docmind_ft.generate import (  # noqa: E402
     HFBackend,
     OllamaBackend,
@@ -38,24 +41,28 @@ from docmind_ft.generate import (  # noqa: E402
 def _backend(args):
     if args.backend == "hf":
         return HFBackend(
-            args.model_id or args.model,
+            args.model_id,
             revision=args.revision,
             adapter_path=args.adapter,
             merged_bf16=args.merged_bf16,
+            token=Settings.from_env().hf_token,
         )
     if args.backend == "ollama":
-        return OllamaBackend(args.model_id or args.model, host=args.host)
+        return OllamaBackend(args.model_id, host=args.host)
     return ProviderBackend()
 
 
 def main(argv: list[str] | None = None) -> int:
+    load_dotenv(REPO_ROOT / ".env")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True, help="run id, e.g. B0, FT-main")
     parser.add_argument("--split", required=True, choices=SPLITS)
     parser.add_argument("--backend", required=True, choices=("hf", "ollama", "provider"))
     parser.add_argument("--out", required=True, type=Path)
     parser.add_argument("--model-id", default=None, help="HF repo/path or Ollama tag")
-    parser.add_argument("--revision", default=None)
+    parser.add_argument(
+        "--revision", default=None, help="HF commit hash (required for test splits)"
+    )
     parser.add_argument("--adapter", type=Path, default=None)
     parser.add_argument("--merged-bf16", action="store_true")
     parser.add_argument("--host", default=None, help="Ollama host URL")
@@ -67,6 +74,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    if args.backend in ("hf", "ollama") and not args.model_id:
+        print(
+            f"error: --model-id is required for the {args.backend} backend",
+            file=sys.stderr,
+        )
+        return 2
     if args.prompt_file is not None and not args.prompt_file.is_file():
         print(f"error: prompt file not found: {args.prompt_file}", file=sys.stderr)
         return 2
@@ -76,19 +89,44 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
+    if args.split in TEST_SPLITS:
+        if not args.revision:
+            print(
+                f"refusing split {args.split!r}: --revision is required for a test split",
+                file=sys.stderr,
+            )
+            return 2
+        frozen_revision = frozen_model_revision()
+        if frozen_revision is None:
+            print(
+                "error: evaluation/gates.json has no meta.model_revision",
+                file=sys.stderr,
+            )
+            return 2
+        if args.revision != frozen_revision:
+            print(
+                f"refusing split {args.split!r}: --revision {args.revision!r} "
+                f"does not match frozen model_revision {frozen_revision!r}",
+                file=sys.stderr,
+            )
+            return 2
     try:
         check_test_guard(args.model, args.split)
     except TestGuardError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
-    summary = run_generation(
-        split=args.split,
-        model=args.model,
-        backend=_backend(args),
-        out_path=args.out,
-        prompt_file=args.prompt_file,
-    )
+    try:
+        summary = run_generation(
+            split=args.split,
+            model=args.model,
+            backend=_backend(args),
+            out_path=args.out,
+            prompt_file=args.prompt_file,
+        )
+    except FrozenError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     print(
         json.dumps(
             {

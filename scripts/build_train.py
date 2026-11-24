@@ -36,6 +36,7 @@ from docmind_ft.teacher_build import (  # noqa: E402
     assemble_trl_rows,
     assign_case,
     case_counts,
+    i2_failures,
     i2_stats,
     is_data25,
     load_chunk_store,
@@ -83,6 +84,10 @@ def main() -> int:
     answers_by_id = load_train_answers(QASPER_TRAIN_PATH)
     distilled, option_a = assemble_trl_rows(teacher_rows, by_id, store, answers_by_id)
     data25 = [row for row in distilled if is_data25(str(row["meta"]["question_id"]))]
+    teacher_summary = summarize_teacher_rows(teacher_rows)
+    teacher_summary["excluded"] = counts.get(CASE_EXCLUDED, 0)
+    expected_rows = int(teacher_summary["kept"])
+    expected_data25 = sum(is_data25(str(row["meta"]["question_id"])) for row in distilled)
 
     train_path = TRAIN_DATA_DIR / "train.jsonl"
     nodistill_path = TRAIN_DATA_DIR / "train_nodistill.jsonl"
@@ -91,11 +96,6 @@ def main() -> int:
     _write_jsonl(nodistill_path, option_a)
     _write_jsonl(data25_path, data25)
 
-    files = {
-        "train": train_path,
-        "train_nodistill": nodistill_path,
-        "train_data25": data25_path,
-    }
     rows_by_file = {
         "train": distilled,
         "train_nodistill": option_a,
@@ -104,17 +104,19 @@ def main() -> int:
     # train_nodistill.jsonl holds verbatim human answers, so the I2
     # word/sentence rules do not apply to it (DECISIONS.md, F1.4).
     i2 = {
-        name: i2_stats(path, check_length=(name != "train_nodistill"))
-        for name, path in files.items()
+        "train": i2_stats(train_path, expected_rows=expected_rows),
+        "train_nodistill": i2_stats(
+            nodistill_path, check_length=False, expected_rows=expected_rows
+        ),
+        "train_data25": i2_stats(data25_path, expected_rows=expected_data25),
     }
     i2_share = {name: stats["i2_valid_share"] for name, stats in i2.items()}
+    failed = i2_failures(i2)
 
     meta_rows = [row["meta"] for row in distilled]
     by_type = Counter(str(meta["answer_type"]) for meta in meta_rows)
     by_case = Counter(str(meta["case"]) for meta in meta_rows)
     by_type_case = Counter(f"{meta['answer_type']}:{meta['case']}" for meta in meta_rows)
-    teacher_summary = summarize_teacher_rows(teacher_rows)
-    teacher_summary["excluded"] = counts.get(CASE_EXCLUDED, 0)
 
     stats = {
         "source_counts": counts,
@@ -143,6 +145,7 @@ def main() -> int:
         "abstention_share": {name: abstention_share(rows) for name, rows in rows_by_file.items()},
         "i2_valid_share": i2_share,
         "i2": i2,
+        "i2_failures": failed,
     }
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     report_path = REPORTS_DIR / "F1-train-stats.json"
@@ -150,10 +153,10 @@ def main() -> int:
         handle.write(json.dumps(stats, indent=2, ensure_ascii=False) + "\n")
 
     print(json.dumps(stats, indent=2, ensure_ascii=False))
-    failed = [name for name, share in i2_share.items() if share < 0.99]
     if failed:
         print(
-            f"I2 gate failed (<0.99): {', '.join(failed)}",
+            "I2 gate failed (valid share < 0.99, rows below expected, "
+            f"or abstention > 0.5): {', '.join(failed)}",
             file=sys.stderr,
         )
         return 1

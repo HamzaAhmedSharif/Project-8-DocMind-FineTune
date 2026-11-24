@@ -10,19 +10,6 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
-# Variables read by Project 8 code (script 3.12). The first four are the
-# secrets/paths Hamza places in .env; the rest have defaults.
-ENV_VAR_NAMES = (
-    "HF_TOKEN",
-    "HF_WRITE_TOKEN",
-    "DOCMIND_LLM_API_KEY",
-    "DOCMIND_P7_DIR",
-    "HF_HOME",
-    "HF_ENDPOINT",
-    "DOCMIND_FT_ALLOW_TEST",
-    "OLLAMA_HOST",
-)
-
 # Names that must appear in .env.example (script F0.4).
 DOTENV_NAMES = (
     "HF_TOKEN",

@@ -25,6 +25,7 @@ import docmind_ft.vendor  # noqa: F401, E402  # installs the docmind_service ali
 
 from docmind_ft.config import Settings  # noqa: E402
 from docmind_ft.contexts import CONTEXTS_DIR, HOLD_QUESTIONS_PATH, PAPER16_QUESTIONS_PATH  # noqa: E402
+from docmind_ft.frozen import FrozenError, verify_context_hash  # noqa: E402
 from docmind_ft.generate import ChunkTextResolver  # noqa: E402
 from docmind_ft.metrics import (  # noqa: E402
     OutputRow,
@@ -145,7 +146,10 @@ def _gold_for(split: str) -> dict[str, dict]:
 
 
 def compute(split: str, outputs_path: Path) -> dict:
-    contexts = _read_jsonl(CONTEXT_FILES[split])
+    context_path = CONTEXT_FILES[split]
+    if context_path.resolve().parent == CONTEXTS_DIR.resolve():
+        verify_context_hash(context_path)
+    contexts = _read_jsonl(context_path)
     outputs = _read_jsonl(outputs_path)
     by_id: dict[str, dict] = {}
     for row in outputs:
@@ -217,6 +221,7 @@ def compute(split: str, outputs_path: Path) -> dict:
         "outputs": str(outputs_path),
         "n_outputs": len(rows),
         "n_expected": len(contexts),
+        "partial": len(rows) != len(contexts),
         "format_valid": _share([format_valid(row.output, row.prompt_chunk_ids) for row in rows]),
         **citation_metrics(rows),
         "citation_support": citation_support(rows),
@@ -272,6 +277,11 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="metrics JSON (default: evaluation/results/metrics_<split>.json)",
     )
+    parser.add_argument(
+        "--allow-partial",
+        action="store_true",
+        help="score a shortfall as an exploratory run and mark it partial",
+    )
     args = parser.parse_args(argv)
 
     if args.split in TEST_SPLITS and not Settings.from_env().docmind_ft_allow_test:
@@ -285,7 +295,18 @@ def main(argv: list[str] | None = None) -> int:
     if not outputs_path.exists():
         print(f"error: outputs file not found: {outputs_path}", file=sys.stderr)
         return 2
-    result = compute(args.split, outputs_path)
+    try:
+        result = compute(args.split, outputs_path)
+    except FrozenError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    if result["partial"] and not args.allow_partial:
+        print(
+            f"refusing to write metrics: {result['n_outputs']}/{result['n_expected']} "
+            "outputs; pass --allow-partial for an exploratory run",
+            file=sys.stderr,
+        )
+        return 2
 
     out_path = args.out or RESULTS_DIR / f"metrics_{args.split}.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)

@@ -39,6 +39,12 @@ from docmind_ft.contexts import (  # noqa: E402
     _load_paper16_questions,
     load_work_questions,
 )
+from docmind_ft.frozen import (  # noqa: E402
+    FrozenError,
+    frozen_b1_prompt_sha256,
+    verify_context_hash,
+)
+from docmind_ft.jsonl import read_jsonl as _read_jsonl  # noqa: E402
 from docmind_ft.prompts import build_prompt_variant  # noqa: E402
 from docmind_ft.vendor.chunking import chunk_pages  # noqa: E402
 from docmind_service.domain import RetrievedChunk  # noqa: E402
@@ -48,6 +54,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 WORK_DIR = Path(r"B:\p8\data\work")
 CHUNKS_PATH = WORK_DIR / "chunks.jsonl"
 LEDGER_PATH = REPO_ROOT / "reports" / "test-eval-ledger.jsonl"
+CLAIMS_DIR = REPO_ROOT / "evaluation" / "results" / ".claims"
 
 SPLITS = ("dev", "qtest", "hold", "paper16")
 TEST_SPLITS = frozenset({"qtest", "hold", "paper16"})
@@ -118,22 +125,6 @@ def adapter_hash(path: str | Path) -> str:
     return digest.hexdigest()
 
 
-def _read_jsonl(path: Path) -> list[dict]:
-    rows: list[dict] = []
-    if not path.exists():
-        return rows
-    with path.open(encoding="utf-8") as handle:
-        for line_number, line in enumerate(handle, start=1):
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                rows.append(json.loads(line))
-            except json.JSONDecodeError as exc:
-                raise ValueError(f"{path}:{line_number}: invalid JSON: {exc}") from exc
-    return rows
-
-
 def _env_bool(name: str) -> bool:
     return os.environ.get(name, "").strip().lower() in ("1", "true", "yes")
 
@@ -157,7 +148,7 @@ def check_test_guard(
         raise TestGuardError("refusing a test-split run: R is not pre-declared for 'qtest'")
     # R is the only split-restricted model (script 3.10: R on HOLD and
     # PAPER16 only); B0, B1 and the FT-* models run on all test splits.
-    for entry in _read_jsonl(ledger_path or LEDGER_PATH):
+    for entry in _read_jsonl(ledger_path or LEDGER_PATH, recover_tail=False):
         if entry.get("model") == model and entry.get("split") == split:
             raise TestGuardError(f"refusing a second test-split run for {model!r} on {split!r}")
 
@@ -267,6 +258,67 @@ def _append_ledger(path: Path, model: str, split: str, digest: str) -> None:
         handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
+def _claim_test_run(model: str, split: str, claims_dir: Path | None = None) -> Path | None:
+    """Atomically claim a test-split run before generation starts."""
+    if split not in TEST_SPLITS:
+        return None
+    directory = claims_dir or CLAIMS_DIR
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / f"{model}__{split}.claim"
+    flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | getattr(os, "O_BINARY", 0)
+    try:
+        fd = os.open(path, flags, 0o644)
+    except FileExistsError as exc:
+        raise TestGuardError(
+            f"refusing a test-split run: a claim already exists for {model!r} on {split!r} ({path})"
+        ) from exc
+    payload = {
+        "model": model,
+        "split": split,
+        "pid": os.getpid(),
+        "time": datetime.now(UTC).isoformat(),
+    }
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write((json.dumps(payload, ensure_ascii=False) + "\n").encode("utf-8"))
+    except Exception:
+        path.unlink(missing_ok=True)
+        raise
+    return path
+
+
+def _release_claim(path: Path | None) -> None:
+    if path is not None:
+        path.unlink(missing_ok=True)
+
+
+def _resume_ids(path: Path, *, model: str, split: str, backend: Backend) -> set[str]:
+    """Read finished ids, refusing rows from another run or duplicates."""
+    expected = {
+        "model": model,
+        "split": split,
+        "model_id": backend.model_id,
+        "backend": backend.name,
+        "revision": backend.revision,
+        "adapter_sha256": backend.adapter_sha256,
+    }
+    finished: set[str] = set()
+    for line_number, row in enumerate(_read_jsonl(path), start=1):
+        question_id = row.get("question_id")
+        if question_id is None:
+            continue
+        question_id = str(question_id)
+        if question_id in finished:
+            raise ValueError(f"{path}:{line_number}: duplicate question_id {question_id!r}")
+        finished.add(question_id)
+        for key, value in expected.items():
+            if key in row and row[key] != value:
+                raise ValueError(
+                    f"{path}:{line_number}: {key} {row[key]!r} does not match this run ({value!r})"
+                )
+    return finished
+
+
 def run_generation(
     *,
     split: str,
@@ -278,6 +330,7 @@ def run_generation(
     chunk_texts: Mapping[str, str] | None = None,
     prompt_file: str | Path | None = None,
     ledger_path: Path | None = None,
+    claims_path: Path | None = None,
     seed: int = SEED,
     max_new_tokens: int = MAX_NEW_TOKENS,
     allow_test: bool | None = None,
@@ -289,7 +342,10 @@ def run_generation(
     if prompt_file is not None and not Path(prompt_file).is_file():
         raise FileNotFoundError(f"prompt file not found: {prompt_file}")
 
-    contexts = _read_jsonl(contexts_path or SPLIT_CONTEXTS[split])
+    context_path = Path(contexts_path) if contexts_path is not None else SPLIT_CONTEXTS[split]
+    if contexts_path is None or context_path.resolve().parent == CONTEXTS_DIR.resolve():
+        verify_context_hash(context_path)
+    contexts = _read_jsonl(context_path, recover_tail=False)
     questions = (
         dict(question_texts) if question_texts is not None else _default_question_texts(split)
     )
@@ -301,68 +357,101 @@ def run_generation(
     if missing:
         raise ValueError(f"no question text for {len(missing)} ids (e.g. {missing[:5]})")
     resolver = _MappingResolver(chunk_texts) if chunk_texts is not None else ChunkTextResolver()
+    prompt_path = Path(prompt_file) if prompt_file is not None else None
+    prompt_template_sha256 = (
+        hashlib.sha256(prompt_path.read_bytes()).hexdigest() if prompt_path is not None else None
+    )
+    if model == "B1":
+        expected = frozen_b1_prompt_sha256()
+        if expected is None:
+            raise FrozenError("evaluation/gates.json has no meta.b1_prompt_sha256")
+        if prompt_template_sha256 is None:
+            raise FrozenError("model B1 requires the frozen prompt file")
+        if prompt_template_sha256 != expected:
+            raise FrozenError(
+                f"frozen B1 prompt mismatch: expected {expected}, got {prompt_template_sha256}"
+            )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    finished = {
-        str(row.get("question_id"))
-        for row in _read_jsonl(out_path)
-        if row.get("question_id") is not None
-    }
-    rng = random.Random(seed)
-    written = 0
-    skipped = 0
-    with out_path.open("a", encoding="utf-8", newline="\n") as handle:
-        for context in contexts:
-            question_id = str(context["question_id"])
-            canary = f"P8-{rng.getrandbits(48):012x}"
-            if question_id in finished:
-                skipped += 1
-                continue
-            question = questions[question_id]
-            paper_id = str(context["paper_id"])
-            chunks = _build_chunks(context, paper_id, resolver, split)
-            if prompt_file is None:
-                prompt, _ = build_prompt_v3(question, chunks, canary)
-            else:
-                prompt = build_prompt_variant(prompt_file, question, chunks, canary)
-            started = time.perf_counter()
-            generated = backend.generate(prompt)
-            seconds = time.perf_counter() - started
-            row = {
-                "question_id": question_id,
-                "split": split,
-                "model": model,
-                "model_id": backend.model_id,
-                "revision": backend.revision,
-                "adapter_sha256": backend.adapter_sha256,
-                "backend": backend.name,
-                "canary": canary,
-                "seed": seed,
-                "max_new_tokens": getattr(backend, "max_new_tokens", max_new_tokens),
-                "prompt_tokens": generated.prompt_tokens,
-                "generated_tokens": generated.generated_tokens,
-                "seconds": round(seconds, 6),
-                "output": generated.text,
-            }
-            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
-            handle.flush()
-            finished.add(question_id)
-            written += 1
+    claim_path = _claim_test_run(model, split, claims_path)
+    try:
+        # Recheck under the claim: another process may have finished and
+        # written the ledger between the first guard check and this claim.
+        check_test_guard(model, split, ledger_path=ledger_path, allow_test=allow_test)
+        finished = _resume_ids(out_path, model=model, split=split, backend=backend)
+        context_ids = {str(context["question_id"]) for context in contexts}
+        unexpected = finished - context_ids
+        if unexpected:
+            raise ValueError(
+                f"{out_path}: {len(unexpected)} finished ids are not in split {split!r} "
+                f"(e.g. {sorted(unexpected)[:5]})"
+            )
+        rng = random.Random(seed)
+        written = 0
+        skipped = 0
+        with out_path.open("a", encoding="utf-8", newline="\n") as handle:
+            for context in contexts:
+                question_id = str(context["question_id"])
+                canary = f"P8-{rng.getrandbits(48):012x}"
+                if question_id in finished:
+                    skipped += 1
+                    continue
+                question = questions[question_id]
+                paper_id = str(context["paper_id"])
+                chunks = _build_chunks(context, paper_id, resolver, split)
+                if prompt_file is None:
+                    prompt, _ = build_prompt_v3(question, chunks, canary)
+                    # No template file: hash the exact prompt sent for this row.
+                    prompt_sha256 = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+                else:
+                    prompt = build_prompt_variant(prompt_file, question, chunks, canary)
+                    prompt_sha256 = prompt_template_sha256
+                started = time.perf_counter()
+                generated = backend.generate(prompt)
+                seconds = time.perf_counter() - started
+                row = {
+                    "question_id": question_id,
+                    "split": split,
+                    "model": model,
+                    "model_id": backend.model_id,
+                    "revision": backend.revision,
+                    "adapter_sha256": backend.adapter_sha256,
+                    "backend": backend.name,
+                    "prompt_sha256": prompt_sha256,
+                    "canary": canary,
+                    "seed": seed,
+                    "max_new_tokens": getattr(backend, "max_new_tokens", max_new_tokens),
+                    "prompt_tokens": generated.prompt_tokens,
+                    "generated_tokens": generated.generated_tokens,
+                    "seconds": round(seconds, 6),
+                    "output": generated.text,
+                }
+                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+                handle.flush()
+                finished.add(question_id)
+                written += 1
 
-    digest = hashlib.sha256(out_path.read_bytes()).hexdigest()
-    ledger_written = split in TEST_SPLITS
-    if ledger_written:
-        _append_ledger(ledger_path or LEDGER_PATH, model, split, digest)
-    return RunSummary(
-        split=split,
-        model=model,
-        questions=len(contexts),
-        written=written,
-        skipped=skipped,
-        output_path=out_path,
-        sha256=digest,
-        ledger_written=ledger_written,
-    )
+        if split in TEST_SPLITS and written + skipped != len(contexts):
+            raise ValueError(
+                f"{out_path}: wrote {written} and skipped {skipped}, "
+                f"expected {len(contexts)} questions for split {split!r}"
+            )
+        digest = hashlib.sha256(out_path.read_bytes()).hexdigest()
+        ledger_written = split in TEST_SPLITS
+        if ledger_written:
+            _append_ledger(ledger_path or LEDGER_PATH, model, split, digest)
+        return RunSummary(
+            split=split,
+            model=model,
+            questions=len(contexts),
+            written=written,
+            skipped=skipped,
+            output_path=out_path,
+            sha256=digest,
+            ledger_written=ledger_written,
+        )
+    finally:
+        _release_claim(claim_path)
 
 
 class _MappingResolver:
@@ -376,6 +465,12 @@ class _MappingResolver:
             return self.mapping[chunk_id]
         except KeyError as exc:
             raise ValueError(f"no chunk text for {chunk_id!r}") from exc
+
+
+def _resolved_commit(model) -> str | None:
+    """The commit hash Transformers records when it resolves a hub revision."""
+    value = getattr(getattr(model, "config", None), "_commit_hash", None)
+    return str(value) if value else None
 
 
 class HFBackend:
@@ -392,6 +487,7 @@ class HFBackend:
         merged_bf16: bool = False,
         load_in_4bit: bool = True,
         max_new_tokens: int = MAX_NEW_TOKENS,
+        token: str | None = None,
     ) -> None:
         if adapter_path and merged_bf16:
             raise ValueError("a merged bf16 model cannot also take an adapter")
@@ -402,6 +498,7 @@ class HFBackend:
         self.merged_bf16 = merged_bf16
         self.load_in_4bit = load_in_4bit
         self.max_new_tokens = max_new_tokens
+        self.token = token
         self._torch = None
         self._tokenizer = None
         self._model = None
@@ -414,8 +511,15 @@ class HFBackend:
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
         self._torch = torch
-        self._tokenizer = AutoTokenizer.from_pretrained(self.model_id, revision=self.revision)
-        kwargs = {"revision": self.revision, "device_map": "auto", "dtype": torch.bfloat16}
+        self._tokenizer = AutoTokenizer.from_pretrained(
+            self.model_id, revision=self.revision, token=self.token
+        )
+        kwargs = {
+            "revision": self.revision,
+            "device_map": "auto",
+            "dtype": torch.bfloat16,
+            "token": self.token,
+        }
         if not self.merged_bf16 and self.load_in_4bit:
             kwargs["quantization_config"] = BitsAndBytesConfig(
                 load_in_4bit=True,
@@ -424,6 +528,9 @@ class HFBackend:
                 bnb_4bit_compute_dtype=torch.bfloat16,
             )
         model = AutoModelForCausalLM.from_pretrained(self.model_id, **kwargs)
+        resolved = _resolved_commit(model)
+        if resolved:
+            self.revision = resolved
         if self.adapter_path is not None:
             from peft import PeftModel
 

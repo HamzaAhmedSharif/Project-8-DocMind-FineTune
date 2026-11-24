@@ -1,18 +1,24 @@
 # Run a long job detached (script 1.9): anything longer than 10 minutes goes
 # through this runner, never through a held-open SSH session.
 #
-#   scripts\run_detached.ps1 -Name <unique> -Script <file> -Args <a> <b>
+#   scripts\run_detached.ps1 -Name <unique> -Script <file> -Args <a> <b> [-TimeoutMinutes <n>] [-DryRun]
+#
+# -DryRun writes the args JSON and wrapper, then exits before scheduling the
+# task (used by tests/test_run_detached.py).
 #
 # Behaviour: creates a one-time scheduled task p8-<Name> whose action is
 # wscript.exe on a generated .vbs launcher; the launcher starts the job via
 # WMI Win32_Process.Create with a SW_HIDE startup object, so no console
 # window appears (plain Task Scheduler powershell.exe actions surface visible
 # Windows Terminal windows on this laptop - 1.3 deviation, see DECISIONS.md).
-# The generated wrapper runs the job, writes a heartbeat line every 60 s to
-# <name>.heartbeat.log, redirects job output to <name>.log (stderr to
-# <name>.log.err), writes <name>.done or <name>.failed, and removes its own
-# scheduled task in a finally block. A second start with the same name
-# refuses when <name>.done exists (idempotence guard).
+# The generated wrapper reads the job script and its arguments from
+# <name>-args.json (never from an interpolated command string), runs the job,
+# writes a heartbeat line every 60 s to <name>.heartbeat.log, redirects job
+# output to <name>.log (stderr to <name>.log.err), writes <name>.done or
+# <name>.failed, and removes its own scheduled task in a finally block.
+# -TimeoutMinutes (default 0 = no timeout) kills the child process tree after
+# the deadline, writes <name>.failed, and exits non-zero. A second start with
+# the same name refuses when <name>.done exists (idempotence guard).
 #
 # The task is registered with NO time trigger and started immediately with
 # Start-ScheduledTask; this script then waits up to 60 s for the wrapper's
@@ -27,9 +33,9 @@
 #
 # Two more F0.4 findings are baked into the wrapper: (1) Start-Process
 # -PassThru .ExitCode reads empty in this host (TOOLS.md), so the wrapper
-# launches the job with raw .NET [Diagnostics.Process]::Start (cmd.exe /c,
-# whose redirection writes stdout/stderr straight to the log files - no
-# pipe buffer to fill) and reads .ExitCode from the .NET Process object.
+# launches the job with raw .NET [Diagnostics.Process]::Start, streams
+# stdout/stderr straight to the log files with CopyToAsync (no pipe buffer
+# to fill), and reads .ExitCode from the .NET Process object.
 # (2) Unregister-ScheduledTask silently failed from the WMI-spawned wrapper
 # (the task survived both instances), so the finally block tries the cmdlet,
 # falls back to schtasks.exe /Delete, and logs the outcome to the heartbeat.
@@ -44,7 +50,9 @@
 param(
     [Parameter(Mandatory = $true)][string]$Name,
     [Parameter(Mandatory = $true)][string]$Script,
-    [Alias("Args")][string[]]$JobArgs = @()
+    [Alias("Args")][string[]]$JobArgs = @(),
+    [ValidateRange(0, 1000000)][int]$TimeoutMinutes = 0,
+    [switch]$DryRun
 )
 
 $ErrorActionPreference = "Stop"
@@ -64,6 +72,7 @@ $LogErr = Join-Path $LogsDir "$Name.log.err"
 $Heartbeat = Join-Path $LogsDir "$Name.heartbeat.log"
 $Done = Join-Path $LogsDir "$Name.done"
 $Failed = Join-Path $LogsDir "$Name.failed"
+$ArgsFile = Join-Path $LogsDir "$Name-args.json"
 $Wrapper = Join-Path $LogsDir "$Name-wrapper.ps1"
 $Launcher = Join-Path $LogsDir "$Name-launcher.vbs"
 
@@ -82,7 +91,7 @@ $JobScript = (Resolve-Path -LiteralPath $Script -ErrorAction Stop).Path
 # A locked stale file means a previous job's process is still alive (killing
 # the wrapper alone orphans the cmd/job chain) - fail with a clear message
 # instead of a raw IOException (F0.4 lesson).
-foreach ($stale in @($Failed, $Log, $LogErr, $Heartbeat)) {
+foreach ($stale in @($Failed, $Log, $LogErr, $Heartbeat, $ArgsFile)) {
     if (Test-Path -LiteralPath $stale) {
         try { Remove-Item -LiteralPath $stale -Force -ErrorAction Stop }
         catch {
@@ -91,27 +100,30 @@ foreach ($stale in @($Failed, $Log, $LogErr, $Heartbeat)) {
     }
 }
 
-# Build the child command line the wrapper will run (embedded literally).
-$childArgs = "-NoProfile -NonInteractive -ExecutionPolicy Bypass -File `"$JobScript`""
-foreach ($a in $JobArgs) {
-    if ($a -match "\s") { $childArgs += " `"$a`"" } else { $childArgs += " $a" }
-}
-
 function Write-TextFile([string]$Path, [string]$Text) {
     # BOM-free UTF-8 (PowerShell 5.1 Set-Content -Encoding utf8 writes a BOM).
     [IO.File]::WriteAllText($Path, $Text, (New-Object Text.UTF8Encoding $false))
 }
 
+# The wrapper reads this JSON; arguments are never interpolated into code or
+# a command line by the parent.
+$argsPayload = [ordered]@{
+    script = $JobScript
+    args = @($JobArgs)
+    timeout_minutes = $TimeoutMinutes
+}
+Write-TextFile -Path $ArgsFile -Text (ConvertTo-Json -InputObject $argsPayload -Depth 3 -Compress)
+
 $wrapperText = @"
 # Generated wrapper for detached job '$Name'. Do not edit; created by scripts/run_detached.ps1.
 `$ErrorActionPreference = 'Continue'
 `$taskName = '$TaskName'
-`$log = '$Log'
-`$logErr = '$LogErr'
-`$heartbeat = '$Heartbeat'
-`$done = '$Done'
-`$failed = '$Failed'
-`$childArgs = '$childArgs'
+`$log = Join-Path `$PSScriptRoot '$Name.log'
+`$logErr = Join-Path `$PSScriptRoot '$Name.log.err'
+`$heartbeat = Join-Path `$PSScriptRoot '$Name.heartbeat.log'
+`$done = Join-Path `$PSScriptRoot '$Name.done'
+`$failed = Join-Path `$PSScriptRoot '$Name.failed'
+`$argsFile = Join-Path `$PSScriptRoot '$Name-args.json'
 # Single-instance guard: a second wrapper for the same job exits silently.
 # (An abandoned mutex means the previous owner died; treat it as acquired.)
 `$mutex = New-Object System.Threading.Mutex(`$false, 'p8-job-$Name')
@@ -119,29 +131,71 @@ $wrapperText = @"
 try { `$acquired = `$mutex.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { `$acquired = `$true }
 if (-not `$acquired) { exit 0 }
 `$started = Get-Date
+`$timedOut = `$false
 try {
     if (Test-Path -LiteralPath `$done) { exit 0 }
     "[`$(Get-Date -Format o)] start task=`$taskName" | Out-File -LiteralPath `$heartbeat -Append -Encoding utf8
-    `$cmdLine = '""powershell.exe" ' + `$childArgs + ' > "' + `$log + '" 2> "' + `$logErr + '"'
+    `$job = Get-Content -LiteralPath `$argsFile -Raw | ConvertFrom-Json
+    `$jobScript = [string]`$job.script
+    `$jobArgs = @()
+    if (`$null -ne `$job.args) { `$jobArgs = @(`$job.args) }
+    `$timeoutMinutes = [int]`$job.timeout_minutes
+    # Windows PowerShell 5.1 has no ProcessStartInfo.ArgumentList; quote each
+    # value for CreateProcess instead of using cmd.exe.
+    function Quote-Arg([string]`$Value) {
+        `$escaped = `$Value -replace '(\\*)"', '`$1`$1\"'
+        `$escaped = `$escaped -replace '(\\+)\z', '`$1`$1'
+        return '"' + `$escaped + '"'
+    }
+    `$argList = @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', (Quote-Arg `$jobScript))
+    foreach (`$arg in `$jobArgs) { `$argList += Quote-Arg ([string]`$arg) }
     `$psi = New-Object System.Diagnostics.ProcessStartInfo
-    `$psi.FileName = 'cmd.exe'
-    `$psi.Arguments = '/c ' + `$cmdLine
+    `$psi.FileName = 'powershell.exe'
+    `$psi.Arguments = `$argList -join ' '
     `$psi.UseShellExecute = `$false
     `$psi.CreateNoWindow = `$true
+    `$psi.RedirectStandardOutput = `$true
+    `$psi.RedirectStandardError = `$true
     `$proc = [System.Diagnostics.Process]::Start(`$psi)
+    `$stdoutStream = [IO.File]::Open(`$log, 'Create', 'Write', 'Read')
+    `$stderrStream = [IO.File]::Open(`$logErr, 'Create', 'Write', 'Read')
+    `$stdoutTask = `$proc.StandardOutput.BaseStream.CopyToAsync(`$stdoutStream)
+    `$stderrTask = `$proc.StandardError.BaseStream.CopyToAsync(`$stderrStream)
+    `$deadline = `$null
+    if (`$timeoutMinutes -gt 0) { `$deadline = `$started.AddMinutes(`$timeoutMinutes) }
+    `$nextHeartbeat = `$started.AddSeconds(60)
     while (-not `$proc.HasExited) {
-        Start-Sleep -Seconds 60
-        if (-not `$proc.HasExited) {
+        Start-Sleep -Seconds 5
+        if (`$proc.HasExited) { break }
+        if (`$null -ne `$deadline -and (Get-Date) -ge `$deadline) {
+            "[`$(Get-Date -Format o)] timeout `${timeoutMinutes}m; killing process tree" | Out-File -LiteralPath `$heartbeat -Append -Encoding utf8
+            try { & "`$env:SystemRoot\System32\taskkill.exe" /PID `$proc.Id /T /F 2>`$null | Out-Null } catch { }
+            try { if (-not `$proc.HasExited) { `$proc.Kill() } } catch { }
+            `$timedOut = `$true
+            break
+        }
+        if ((Get-Date) -ge `$nextHeartbeat) {
             `$elapsed = [int]((Get-Date) - `$started).TotalSeconds
             "[`$(Get-Date -Format o)] heartbeat `${elapsed}s" | Out-File -LiteralPath `$heartbeat -Append -Encoding utf8
+            `$nextHeartbeat = (Get-Date).AddSeconds(60)
         }
     }
+    `$proc.WaitForExit()
+    `$stdoutTask.Wait()
+    `$stderrTask.Wait()
+    `$stdoutStream.Dispose()
+    `$stderrStream.Dispose()
     `$exitCode = `$proc.ExitCode
     `$ended = Get-Date
     "[`$(Get-Date -Format o)] end exit=`$exitCode" | Out-File -LiteralPath `$heartbeat -Append -Encoding utf8
-    `$marker = "exit_code=`$exitCode`nstarted=`$(`$started.ToString('o'))`nended=`$(`$ended.ToString('o'))`n"
-    if (`$exitCode -eq 0) { [IO.File]::WriteAllText(`$done, `$marker, (New-Object Text.UTF8Encoding `$false)) }
-    else { [IO.File]::WriteAllText(`$failed, `$marker, (New-Object Text.UTF8Encoding `$false)) }
+    if (`$timedOut) {
+        `$marker = "timeout_minutes=`$timeoutMinutes`nstarted=`$(`$started.ToString('o'))`nended=`$(`$ended.ToString('o'))`n"
+        [IO.File]::WriteAllText(`$failed, `$marker, (New-Object Text.UTF8Encoding `$false))
+    } else {
+        `$marker = "exit_code=`$exitCode`nstarted=`$(`$started.ToString('o'))`nended=`$(`$ended.ToString('o'))`n"
+        if (`$exitCode -eq 0) { [IO.File]::WriteAllText(`$done, `$marker, (New-Object Text.UTF8Encoding `$false)) }
+        else { [IO.File]::WriteAllText(`$failed, `$marker, (New-Object Text.UTF8Encoding `$false)) }
+    }
 } catch {
     `$marker = "error: `$(`$_.Exception.Message)`n"
     [IO.File]::WriteAllText(`$failed, `$marker, (New-Object Text.UTF8Encoding `$false))
@@ -161,6 +215,7 @@ try {
     }
     try { "[`$(Get-Date -Format o)] unregister: `$unreg" | Out-File -LiteralPath `$heartbeat -Append -Encoding utf8 } catch { }
 }
+if (`$timedOut) { exit 1 }
 "@
 Write-TextFile -Path $Wrapper -Text $wrapperText
 
@@ -175,6 +230,11 @@ $vbsText = "' Generated launcher for detached job '$Name'. Do not edit; created 
     "cmd = `"" + $vbsCmd.Replace("`"", "`"`"") + "`"" + "`r`n" +
     "rc = proc.Create(cmd, Null, startup, pid)" + "`r`n"
 Write-TextFile -Path $Launcher -Text $vbsText
+
+if ($DryRun) {
+    Write-Output "dry-run: args=$ArgsFile wrapper=$Wrapper launcher=$Launcher"
+    return
+}
 
 # No time trigger (see header): start immediately, then verify the wrapper
 # actually launched by waiting for its heartbeat "start" line.

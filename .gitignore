@@ -3,6 +3,7 @@ STATE.md
 OPEN_QUESTIONS.md
 reports/
 data/
+evaluation/results/.claims/
 .env
 .env.*
 !.env.example

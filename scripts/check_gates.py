@@ -4,9 +4,10 @@
 Modes:
   --schema-only    validate evaluation/gates.json shape (all I/TH/HY entries
                    present with metric/op/value or thresholds). Used by
-                   check.ps1 and CI from F0.
-  --verify-freeze  confirm gates.json still matches the frozen blob hash in
-                   reports/hashes.json (from the F2.7 freeze on).
+                   check.ps1.
+  --verify-freeze  verify gates.json and the frozen inputs against
+                   evaluation/gates.lock (fallback: reports/hashes.json).
+                   Used by CI and verify.ps1 -Milestone F2.
   --hypotheses     evaluate HY1-HY6 from evaluation/results/*.json (F5).
 """
 
@@ -21,6 +22,14 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 GATES_PATH = REPO_ROOT / "evaluation" / "gates.json"
 HASHES_PATH = REPO_ROOT / "reports" / "hashes.json"
+LOCK_PATH = REPO_ROOT / "evaluation" / "gates.lock"
+
+CONTEXT_NAMES = ("contexts_qdev", "contexts_qtest", "contexts_hold", "contexts_paper16")
+SPLIT_FILES = {
+    "qdev": ("evaluation/splits/qdev.json", "qdev_sha256"),
+    "qtest": ("evaluation/splits/qtest.json", "qtest_sha256"),
+    "holdout": ("evaluation/holdout/holdout_questions.jsonl", "holdout_sha256"),
+}
 
 REQUIRED = {
     "integrity": ["I1", "I2", "I3", "I4", "I5", "I6", "I7"],
@@ -61,24 +70,87 @@ def schema_only() -> int:
     return 0
 
 
+def _verify_file(label: str, record: dict) -> int:
+    path_value = record.get("path")
+    expected = record.get("sha256")
+    if not isinstance(path_value, str) or not path_value:
+        print(f"FAIL: {label}: no path recorded")
+        return 1
+    if not isinstance(expected, str) or not expected:
+        print(f"FAIL: {label}: no sha256 recorded")
+        return 1
+    path = Path(path_value)
+    if not path.is_absolute():
+        path = REPO_ROOT / path
+    if not path.is_file():
+        print(f"FAIL: {label}: missing {path}")
+        return 1
+    actual = hashlib.sha256(path.read_bytes()).hexdigest()
+    if actual != expected:
+        print(f"FAIL: {label}: expected {expected}, got {actual}")
+        return 1
+    print(f"{label} hash OK")
+    return 0
+
+
 def verify_freeze() -> int:
     gates = load_gates()
     if not gates.get("meta", {}).get("frozen_at"):
         print("gates NOT frozen (meta.frozen_at is null)")
         return 1
-    if not HASHES_PATH.exists():
-        print("FAIL: reports/hashes.json missing — cannot verify freeze")
+    record_path = LOCK_PATH if LOCK_PATH.is_file() else HASHES_PATH
+    if not record_path.is_file():
+        print("FAIL: evaluation/gates.lock and reports/hashes.json are both missing")
         return 1
-    hashes = json.loads(HASHES_PATH.read_text(encoding="utf-8"))
-    frozen = hashes.get("gates.json", {}).get("frozen_blob_sha256")
+    try:
+        records = json.loads(record_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"FAIL: cannot read {record_path}: {exc}")
+        return 1
+    if not isinstance(records, dict):
+        print(f"FAIL: {record_path}: expected a JSON object")
+        return 1
+
+    failures = 0
+    gate_record = records.get("gates.json")
+    frozen = gate_record.get("frozen_blob_sha256") if isinstance(gate_record, dict) else None
     if not frozen:
-        print("FAIL: no frozen gates.json hash recorded in hashes.json")
+        print(f"FAIL: no gates.json frozen hash recorded in {record_path}")
+        failures += 1
+    else:
+        current = hashlib.sha256(GATES_PATH.read_bytes()).hexdigest()
+        if current != frozen:
+            print("FAIL: gates.json differs from the frozen hash")
+            failures += 1
+        else:
+            print("gates frozen hash OK")
+
+    contexts = records.get("contexts")
+    if not isinstance(contexts, dict):
+        print(f"FAIL: {record_path}: no contexts hash table")
+        failures += 1
+    else:
+        for name in CONTEXT_NAMES:
+            entry = contexts.get(name)
+            if not isinstance(entry, dict):
+                print(f"FAIL: contexts.{name} missing")
+                failures += 1
+            else:
+                failures += _verify_file(f"contexts.{name}", entry)
+
+    splits = records.get("splits")
+    if not isinstance(splits, dict):
+        splits = {}
+    for name, (path, key) in SPLIT_FILES.items():
+        entry = splits.get(name)
+        if not isinstance(entry, dict):
+            entry = {"path": path, "sha256": gates.get("meta", {}).get(key)}
+        failures += _verify_file(f"splits.{name}", entry)
+
+    if failures:
+        print(f"gates freeze + input hashes FAILED ({failures} problem(s))")
         return 1
-    current = hashlib.sha256(GATES_PATH.read_bytes()).hexdigest()
-    if current != frozen:
-        print("FAIL: gates.json differs from the frozen hash")
-        return 1
-    print("gates frozen hash OK")
+    print("gates freeze + context/split hashes OK")
     return 0
 
 

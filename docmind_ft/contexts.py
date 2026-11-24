@@ -197,7 +197,6 @@ def _chunk_and_embed_paper(
 
 def _retrieve_top10(
     question_text: str,
-    paper_id: str,
     chunk_ids: list[str],
     pages: list[int],
     matrix,
@@ -228,7 +227,7 @@ def _build_contexts(
             {
                 "question_id": question_id,
                 "paper_id": paper_id,
-                "chunks": _retrieve_top10(question, paper_id, chunk_ids, pages, matrix, embedder),
+                "chunks": _retrieve_top10(question, chunk_ids, pages, matrix, embedder),
             }
         )
     return rows

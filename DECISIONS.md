@@ -611,3 +611,44 @@ of script 3.1 open the F0 section, with their evidence.
 - F2.6 sealed generation is now fully complete (B0 + B1 on
   Q-TEST/HOLD/PAPER16, R on HOLD/PAPER16). F2.7 gate freeze waits
   only on [H5].
+
+### Note: Ponytail audit fixes (2026-11-24, after F2 PASS)
+
+- /ponytail-audit returned 20 findings (5 Must, 10 Should, 5 Nice).
+  Sol judged all five Must items real; none invalidated any F2 result
+  (B0/B1/R runs used pinned revisions, correct output files, full row
+  counts, and the frozen prompt). Batches A (Must 1-5), B (Should 6-9),
+  and C (12-18, 20 + README) were implemented by OpenCode and verified
+  by Sol: ruff clean, 262 tests pass, verify.ps1 -Milestone F2 PASSED,
+  I7 recomputation 8/8 lines 0 problems, secret scan 0 hits, plus live
+  refusal checks (frozen rebuild, missing --revision, foreign resume
+  rows, partial metrics).
+- What changed: resume validates model/split/model_id/backend/revision/
+  adapter before skipping and refuses duplicates and foreign ids;
+  frozen inputs refuse rebuilds without --force and hashes.json is
+  merged, not replaced; compute_metrics requires full coverage by
+  default (exit 2) with --allow-partial marking output partial; empty
+  training files score I2 0.0 and the build fails above 0.5 abstention
+  share; test splits require --revision matching the frozen revision;
+  test runs take an atomic O_EXCL claim under
+  evaluation/results/.claims/; the detached runner takes args via JSON
+  (no cmd.exe) with -TimeoutMinutes; truncated final JSONL lines
+  recover on resume; HF loads use the .env token; rows record
+  prompt_sha256; B1 requires the frozen prompt file on every run;
+  evaluation/gates.lock commits the frozen hashes and CI runs
+  --verify-freeze; verify.ps1 implements F2; README updated;
+  requires-python is now >=3.10 with ruff target py310.
+- Skipped items 10/11 (V3 yes/no lead-in, V4 near-copy
+  case-sensitivity): the teacher build is done and train.jsonl is
+  frozen, so fixing the filters changes nothing. Recorded as known
+  limitations of the frozen training data, not fixed.
+- Deferred item 19 (CI audits only the tiny CI requirements): hygiene
+  for a research repo, not correctness.
+- Stale claims: a hard-killed test run can leave a claim file in
+  evaluation/results/.claims/. Remove it manually before retrying;
+  the file carries pid + time so a stale one is identifiable.
+- Known follow-up: the --revision guard currently applies to every
+  backend on test splits, but provider/ollama runs have no HF
+  revision. Scope it to the hf backend only (small fix, not blocking:
+  no provider test runs are planned and R is split-restricted to HOLD
+  and PAPER16 by the test guard).

@@ -29,6 +29,7 @@ from uuid import NAMESPACE_URL, uuid4, uuid5
 import numpy as np
 
 import docmind_ft.vendor  # noqa: F401  (installs the docmind_service alias)
+from docmind_ft.jsonl import read_jsonl
 from docmind_ft.qasper import Answer, load_qasper
 from docmind_ft.retrieval import (
     TOP_K,
@@ -154,19 +155,6 @@ class ProbeOutcome:
     @property
     def failed(self) -> bool:
         return not self.check.passed
-
-
-def read_jsonl(path: str | Path) -> list[dict[str, object]]:
-    rows = []
-    with Path(path).open(encoding="utf-8") as handle:
-        for line_number, line in enumerate(handle, start=1):
-            if not line.strip():
-                continue
-            try:
-                rows.append(json.loads(line))
-            except json.JSONDecodeError as exc:
-                raise ValueError(f"{path}:{line_number}: invalid JSON: {exc}") from exc
-    return rows
 
 
 def load_train_questions(path: str | Path = QUESTIONS_PATH) -> list[TrainQuestion]:
@@ -626,8 +614,10 @@ def validate_trl_row(row: Mapping[str, object], *, check_length: bool = True) ->
     return errors
 
 
-def i2_stats(path: str | Path, *, check_length: bool = True) -> dict[str, object]:
-    total = valid = 0
+def i2_stats(
+    path: str | Path, *, check_length: bool = True, expected_rows: int | None = None
+) -> dict[str, object]:
+    total = valid = abstentions = 0
     errors: list[str] = []
     with Path(path).open(encoding="utf-8") as handle:
         for line_number, line in enumerate(handle, start=1):
@@ -639,6 +629,8 @@ def i2_stats(path: str | Path, *, check_length: bool = True) -> dict[str, object
             except json.JSONDecodeError as exc:
                 errors.append(f"line {line_number}: invalid JSON: {exc}")
                 continue
+            if _target_text(row) == NO_EVIDENCE_ANSWER:
+                abstentions += 1
             row_errors = validate_trl_row(row, check_length=check_length)
             if row_errors:
                 errors.append(f"line {line_number}: {row_errors[0]}")
@@ -647,9 +639,30 @@ def i2_stats(path: str | Path, *, check_length: bool = True) -> dict[str, object
     return {
         "rows": total,
         "valid": valid,
-        "i2_valid_share": valid / total if total else 1.0,
+        "expected_rows": expected_rows,
+        "below_expected": expected_rows is not None and total < expected_rows,
+        "i2_valid_share": valid / total if total else 0.0,
+        "abstention_share": abstentions / total if total else 0.0,
         "errors": errors[:20],
     }
+
+
+def i2_failures(
+    i2: Mapping[str, Mapping[str, object]],
+    *,
+    min_valid_share: float = 0.99,
+    max_abstention_share: float = 0.5,
+) -> list[str]:
+    """Training files that fail I2, its row floor, or the abstention ceiling."""
+    failed = []
+    for name, stats in i2.items():
+        if float(stats.get("i2_valid_share", 0.0)) < min_valid_share:
+            failed.append(name)
+        elif bool(stats.get("below_expected")):
+            failed.append(name)
+        elif float(stats.get("abstention_share", 0.0)) > max_abstention_share:
+            failed.append(name)
+    return failed
 
 
 def percentile(values: Sequence[float], fraction: float) -> float:
@@ -694,19 +707,21 @@ def answer_length_stats(rows: Sequence[Mapping[str, object]]) -> dict[str, objec
     }
 
 
+def _target_text(row: Mapping[str, object]) -> str:
+    completion = row.get("completion")
+    if not isinstance(completion, list) or not completion:
+        return ""
+    first = completion[0]
+    if not isinstance(first, Mapping):
+        return ""
+    content = first.get("content")
+    return content if isinstance(content, str) else ""
+
+
 def abstention_share(rows: Sequence[Mapping[str, object]]) -> float:
     if not rows:
         return 0.0
-    abstentions = 0
-    for row in rows:
-        completion = row.get("completion")
-        if (
-            isinstance(completion, list)
-            and completion
-            and isinstance(completion[0], Mapping)
-            and completion[0].get("content") == NO_EVIDENCE_ANSWER
-        ):
-            abstentions += 1
+    abstentions = sum(_target_text(row) == NO_EVIDENCE_ANSWER for row in rows)
     return abstentions / len(rows)
 
 
