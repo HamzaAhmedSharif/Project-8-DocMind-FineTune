@@ -25,3 +25,27 @@ tracebacks/logs, reproduce errors).
    repo, read the run output.
 3. Local run: activate the `docmind-ft` env, run pytest + ruff,
    `nvidia-smi`, one train/eval command.
+
+## F3.1 — QLoRA trainer over a pre-tokenized masked dataset (2026-11-25)
+
+- Concept: the trainer runs over a pre-tokenized masked dataset via
+  `dataset_kwargs={"skip_prepare_dataset": True}`, with
+  `completion_only_loss` left to auto-detect. TRL 1.12's `SFTConfig`
+  has no `warmup_ratio` field, so the warmup ratio is translated to
+  `warmup_steps` before the config is built.
+- What ran: dev-loss build — 374 sampled / 201 kept / gate PASSED
+  (I2 valid share 1.0, all six overlaps 0). 5-step smoke train
+  (`--max-steps 5`), 04:33–06:17 (~1h44m), checkpoint-5 saved with
+  adapter + metadata. No train loss was logged: `logging_steps` (10)
+  exceeds `max_steps` (5), so no train-log event fired and
+  `train_loss.csv` holds only its header. The only loss on record is
+  eval_loss 0.7897 at step 5 (eval entropy 0.8748, mean token
+  accuracy 0.7902). Peak VRAM was not recorded in the artifacts;
+  live `nvidia-smi` during the run showed ~7.9 GB used at 100% GPU.
+- What it proved: mask gates I2/I3 pass and the GPU training path
+  works end to end.
+- Environment notes: `HF_HOME` is now a persistent user variable
+  (`B:\p8\hf-cache`, set with `setx`); the HF login token lives at
+  `B:\p8\hf-cache\token`. The smoke took ~1h44m, not 3-5 min, because
+  5 optimizer steps = 80 micro-steps at ~50 s each (16 accumulation
+  steps per optimizer step).

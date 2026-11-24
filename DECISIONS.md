@@ -696,3 +696,10 @@ of script 3.1 open the F0 section, with their evidence.
 - Rejected: keeping the delete-both behavior (wastes ~25 min per rebuild); a separate --rebuild flag (unnecessary once --force is fixed).
 - Tradeoff accepted: a genuinely stale teacher output must be deleted by hand.
 - Would revisit if: never.
+
+### Decision: Warmup ratio translated to warmup_steps (TRL 1.12 has no warmup_ratio)
+- Context: TRL 1.12's SFTConfig has warmup_steps but no warmup_ratio field, so passing the config's warmup_ratio through fails. The full run needs ~3% warmup over 180 total optimizer steps.
+- Chosen: compute warmup_steps = int(ratio x total optimizer steps) via the warmup_steps_for helper in docmind_ft/train.py; 180 total steps -> 5 warmup steps. The helper caps the total at max_steps when set (smoke run: max_steps=5 -> 0 warmup steps). Covered by tests in tests/test_train.py. Evidence: 5-step smoke run 2026-11-25 (checkpoint-5 saved, eval_loss 0.7897).
+- Rejected: dropping warmup (loses the warmup the training plan specifies); post-hoc attribute assignment (setting warmup_ratio on the built config object would be silently ignored by SFTConfig).
+- Tradeoff accepted: the ratio is quantized to whole steps (5 steps for 3% of 180, i.e. 2.8% actual).
+- Would revisit if: a TRL upgrade reintroduces warmup_ratio (then drop the helper and pass the ratio directly).

@@ -442,6 +442,18 @@ class LossHeartbeatCallback(TrainerCallback):
         self._csv_handle.close()
 
 
+def warmup_steps_for(n_rows, eff_batch, epochs, warmup_ratio, max_steps=None):
+    """Translate a warmup ratio into warmup steps.
+
+    TRL 1.12's SFTConfig has no warmup_ratio field (only warmup_steps), so
+    the recipe's ratio is converted from the real total optimizer steps.
+    """
+    total = ((n_rows + eff_batch - 1) // eff_batch) * epochs
+    if max_steps is not None:
+        total = min(total, max_steps)
+    return int(warmup_ratio * total)
+
+
 def main() -> int:
     args = parse_args()
 
@@ -715,6 +727,14 @@ def main() -> int:
     # the trainer uses our labels as-is, and they already encode the mask
     # (-100 on prompt tokens, verified by the I3 gate).
     eval_strategy = "steps" if eval_dataset is not None else "no"
+    warmup_steps = warmup_steps_for(
+        len(dataset),
+        cfg["train"]["per_device_train_batch_size"] * cfg["train"]["gradient_accumulation_steps"],
+        cfg["train"]["epochs"],
+        cfg["train"]["warmup_ratio"],
+        max_steps=args.max_steps,
+    )
+    print(f"warmup: {warmup_steps} steps (ratio {cfg['train']['warmup_ratio']})")
     sft_config = SFTConfig(
         output_dir=args.output_dir,
         max_length=max_length,
@@ -723,7 +743,7 @@ def main() -> int:
         num_train_epochs=cfg["train"]["epochs"],
         learning_rate=cfg["train"]["learning_rate"],
         lr_scheduler_type=cfg["train"]["lr_scheduler"],
-        warmup_ratio=cfg["train"]["warmup_ratio"],
+        warmup_steps=warmup_steps,
         weight_decay=cfg["train"]["weight_decay"],
         bf16=cfg["train"]["bf16"],
         gradient_checkpointing=cfg["train"]["gradient_checkpointing"],

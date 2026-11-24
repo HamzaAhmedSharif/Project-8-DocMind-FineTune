@@ -305,3 +305,24 @@ def test_loss_callback_on_save_writes_metadata(tmp_path):
     callback.on_train_end(args, state, None)
     saved = json.loads((checkpoint / "model_metadata.json").read_text(encoding="utf-8"))
     assert saved == metadata
+
+
+def test_warmup_steps_for_full_run():
+    from docmind_ft.train import warmup_steps_for
+
+    # 1440 rows, eff. batch 16, 2 epochs -> 180 total steps; 3% warmup -> 5.
+    assert warmup_steps_for(1440, 16, 2, 0.03) == 5
+
+
+def test_warmup_steps_for_max_steps_cap():
+    from docmind_ft.train import warmup_steps_for
+
+    # Smoke run: max_steps=5 caps the total, so warmup is 0 steps.
+    assert warmup_steps_for(1440, 16, 2, 0.03, max_steps=5) == 0
+
+
+def test_warmup_steps_for_partial_batch():
+    from docmind_ft.train import warmup_steps_for
+
+    # Partial last batch rounds up: 100 rows / 16 -> 7 steps; 50% -> 3.
+    assert warmup_steps_for(100, 16, 1, 0.5) == 3
