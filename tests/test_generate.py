@@ -496,7 +496,7 @@ def test_run_eval_cli_refuses_a_test_split_without_env(tmp_path, monkeypatch):
     assert not (tmp_path / "out.jsonl").exists()
 
 
-def test_run_eval_cli_refuses_a_test_split_without_revision(tmp_path, monkeypatch):
+def test_run_eval_cli_refuses_an_hf_test_split_without_revision(tmp_path, monkeypatch, capsys):
     monkeypatch.setenv("DOCMIND_FT_ALLOW_TEST", "1")
     module = _load_script("run_eval")
     out_path = tmp_path / "out.jsonl"
@@ -515,7 +515,47 @@ def test_run_eval_cli_refuses_a_test_split_without_revision(tmp_path, monkeypatc
         ]
     )
     assert code == 2
+    assert "--revision is required" in capsys.readouterr().err
     assert not out_path.exists()
+
+
+def test_run_eval_cli_allows_a_provider_test_split_without_revision(tmp_path, monkeypatch):
+    monkeypatch.setenv("DOCMIND_FT_ALLOW_TEST", "1")
+    module = _load_script("run_eval")
+    seen = {}
+
+    def fake_run_generation(**kwargs):
+        seen.update(kwargs)
+        return SimpleNamespace(
+            split="hold",
+            model="R",
+            questions=0,
+            written=0,
+            skipped=0,
+            output_path=kwargs["out_path"],
+            sha256="0" * 64,
+            ledger_written=False,
+        )
+
+    monkeypatch.setattr(module, "check_test_guard", lambda *args, **kwargs: None)
+    monkeypatch.setattr(module, "_backend", lambda args: object())
+    monkeypatch.setattr(module, "run_generation", fake_run_generation)
+    out_path = tmp_path / "out.jsonl"
+    code = module.main(
+        [
+            "--model",
+            "R",
+            "--split",
+            "hold",
+            "--backend",
+            "provider",
+            "--out",
+            str(out_path),
+        ]
+    )
+    assert code == 0
+    assert seen["split"] == "hold"
+    assert seen["model"] == "R"
 
 
 def test_run_eval_cli_refuses_a_revision_that_misses_the_frozen_hash(tmp_path, monkeypatch):

@@ -89,7 +89,7 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
-    if args.split in TEST_SPLITS:
+    if args.split in TEST_SPLITS and args.backend == "hf":
         if not args.revision:
             print(
                 f"refusing split {args.split!r}: --revision is required for a test split",
