@@ -597,3 +597,17 @@ of script 3.1 open the F0 section, with their evidence.
   re-ran clean. Lesson: copy the B0 sealed wrapper form exactly
   for test-split runs.
 - Remaining for F2.6: R HOLD 63/96 (resume cron fired 07:30 today).
+
+### Note: R HOLD complete (F2.5)
+
+- R on HOLD: 96/96 rows (resume wrote 33, skipped 63), sha256
+  ed586e61, ledger line written (8 lines total). Provider budget
+  now 115/150.
+- The 07:30 resume (f2-r-hold4) failed in 60 s on Groq 403: the
+  old key was revoked account-level, not the token limit. Hamza
+  rotated the key in .env (verified 200 on the models endpoint);
+  re-run as f2-r-hold5 finished 15:23 CST. The same key is also
+  his OpenCode provider key — rotate there too if not done.
+- F2.6 sealed generation is now fully complete (B0 + B1 on
+  Q-TEST/HOLD/PAPER16, R on HOLD/PAPER16). F2.7 gate freeze waits
+  only on [H5].
