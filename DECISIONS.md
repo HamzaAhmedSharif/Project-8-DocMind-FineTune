@@ -652,3 +652,33 @@ of script 3.1 open the F0 section, with their evidence.
   revision. Scope it to the hf backend only (small fix, not blocking:
   no provider test runs are planned and R is split-restricted to HOLD
   and PAPER16 by the test guard).
+
+## F3 - Training pipeline and smoke tests (2026-11-25)
+
+### Decision: Pre-tokenized dataset + skip_prepare_dataset via dataset_kwargs
+- Context: the trainer pre-tokenizes train.jsonl through build_example (labels masked by construction, -100 on prompt tokens). TRL 1.12's SFTTrainer would otherwise re-tokenize from prompt/completion columns, which no longer exist after filtering.
+- Chosen: pass the pre-tokenized dataset (input_ids/labels/attention_mask) with SFTConfig(dataset_kwargs={"skip_prepare_dataset": True}). Verified from the installed TRL 1.12.0 source: skip_prepare_dataset is ONLY supported inside dataset_kwargs (trl/trainer/sft_config.py:58-60; trl/trainer/sft_trainer.py:1271-1273), and the trainer requires a labels column when skipping preparation (sft_trainer.py:1695-1706). Evidence: F3.1 verification, 2026-11-25.
+- Rejected: top-level SFTConfig(skip_prepare_dataset=True) (not a field -- raises TypeError); passing a plain TrainingArguments to SFTTrainer (converts to SFTConfig with defaults, losing the skip flag -- the round-4 bug); falling back to transformers Trainer (unnecessary once the dataset_kwargs form was verified).
+- Tradeoff accepted: the trainer depends on TRL's skip-prepare path; a TRL upgrade needs the dataset_kwargs form re-checked.
+- Would revisit if: a TRL upgrade removes or renames the skip-prepare path.
+
+### Decision: completion_only_loss NOT passed to the trainer
+- Context: the config sets completion_only_loss: true, and TRL's SFTConfig has the field. But with skip_prepare_dataset the trainer uses labels as-is; the flag only matters during dataset preparation, which is skipped.
+- Chosen: leave completion_only_loss as None (TRL auto-detects False for a dataset without prompt/completion columns) and rely on the pre-tokenized labels, which encode the mask by construction and are verified by the I3 gate (20/20). Evidence: trl/trainer/sft_trainer.py:1200-1203, 1592-1598.
+- Rejected: passing completion_only_loss=True (redundant with skip_prepare_dataset; risks the trainer re-deriving a mask from columns that do not exist).
+- Tradeoff accepted: the config's completion_only_loss: true describes the DATA (labels masked), not a trainer flag -- the comment in train.py records this.
+- Would revisit if: the pre-tokenization path is ever replaced by TRL dataset preparation.
+
+### Decision: Dev-loss set uses ALL 374 eligible dev questions (~220 kept expected)
+- Context: the F3.1 target was ~300 dev-loss rows, but after excluding Q-DEV questions (200) and Q-DEV papers (144), only 374 dev questions remain eligible, and the teacher keep rate is ~60% (F1.4: 1,444 kept from 2,372; dry runs 6/10 and 2/5).
+- Chosen: sample all 374 eligible questions; expected ~220 kept rows. The set is a training diagnostic (loss curve + overfitting signal), not a benchmark, so ~220 rows is sufficient. Evidence: build_dev_loss.py dry runs, 2026-11-25.
+- Rejected: capping at 300 sampled (~180 kept -- fewer rows for no benefit); relaxing the Q-DEV paper exclusion (violates the F3.1 spec); using QASPER test questions (Q-TEST is sealed until F5).
+- Tradeoff accepted: the dev-loss set is smaller than the ~300 target; the report records the exact kept count.
+- Would revisit if: never -- the set is built once from the fixed eligible pool.
+
+### Decision: Tokenizer hash from the local HF snapshot, computed before training
+- Context: model_metadata.json needs the tokenizer's SHA-256. The round-2/3/4 code hashed files after save_pretrained, from paths that did not exist (a "tokenizer" subdir that save_pretrained never creates), crashing or falling back to a placeholder.
+- Chosen: hash the tokenizer files (tokenizer.json, tokenizer_config.json, special_tokens_map.json, vocab/merges) from the local HF snapshot dir via snapshot_download(local_files_only=True), computed once before training so the per-checkpoint callback can use it. Raises FileNotFoundError when no tokenizer file is present -- never a placeholder hash.
+- Rejected: hashing the save_pretrained output dir (the files land in the run root, mixed with checkpoints -- fragile to enumerate); hashing the tokenizer object (hash() is not stable across runs).
+- Tradeoff accepted: the hash covers the snapshot files, not the in-memory tokenizer -- the two are identical by construction (the tokenizer is loaded from that snapshot).
+- Would revisit if: never.
