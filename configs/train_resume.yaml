@@ -1,0 +1,45 @@
+base_model: meta-llama/Llama-3.2-3B-Instruct
+revision: 0cb88a4f764b7a12671c53f0838cd831a0843b95
+seed: 20261207
+
+quant:
+  load_in_4bit: true
+  bnb_4bit_quant_type: nf4
+  bnb_4bit_use_double_quant: true
+  bnb_4bit_compute_dtype: bfloat16
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  bias: none
+  task_type: CAUSAL_LM
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+train:
+  epochs: 2
+  learning_rate: 2.0e-4
+  # cosine so the resume check exercises scheduler-state restore
+  lr_scheduler: cosine
+  warmup_ratio: 0.03
+  weight_decay: 0.0
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 1
+  max_length: 3072
+  gradient_checkpointing: true
+  optim: paged_adamw_8bit
+  bf16: true
+  packing: false
+  completion_only_loss: true
+  logging_steps: 1
+  eval_steps: 1000000
+  save_steps: 4
+  save_total_limit: 3
+  load_best_model_at_end: false

@@ -49,3 +49,6 @@ tracebacks/logs, reproduce errors).
   `B:\p8\hf-cache\token`. The smoke took ~1h44m, not 3-5 min, because
   5 optimizer steps = 80 micro-steps at ~50 s each (16 accumulation
   steps per optimizer step).
+- **HO-1 (F3.2 pace, verified)**: median ~9.7 s, short ~6.2 s, long ~36 s per micro-step at GA 1. Confirmed by the three probe variants: median train_runtime ~58 s / 6 steps = 9.7 s/step; short ~37 s / 6 steps = 6.2 s/step; long sequences exceed 8 GB and die with OOM before completing all steps. At GA 16, each optimizer step is ~15 min. **Lesson**: the pacing is length-dependent; short sequences train proportionally faster, long sequences hit the 8 GB VRAM ceiling.
+
+- **HO-2 (F3.4 resume)**: the 12-step run completed (94.85s, peak VRAM 5.98 GB) but the external kill-resume (HO-2) is still outstanding. Hamza must perform the kill by hand at heartbeat step 6, then resume with --resume-from checkpoint-4 --max-steps 12. Pass criteria: resumed log starts at step 5, final global_step 12, LR at step 5 after resume equals pre-kill. Results will be appended to this log after the run completes.

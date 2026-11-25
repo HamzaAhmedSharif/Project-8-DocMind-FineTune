@@ -1,0 +1,66 @@
+[
+  {
+    "question_id": "6147846520a3dc05b230241f2ad6d411d614e24c",
+    "paper_id": "1909.03464",
+    "length": 2190,
+    "case": "A",
+    "answer_type": "extractive",
+    "id_sha256": "011d972842b48d5ad79db66306ac100506247065e4584b24f904e96fe40829eb"
+  },
+  {
+    "question_id": "3996438cef34eb7bedaa6745b190c69553cf246b",
+    "paper_id": "1804.05868",
+    "length": 2229,
+    "case": "U",
+    "answer_type": "unanswerable",
+    "id_sha256": "015cca14d5c51626e348b4d10ed0c3764bedc53156fdf70a2b31e1c65fb2a0ad"
+  },
+  {
+    "question_id": "c6e63e3b807474e29bfe32542321d015009e7148",
+    "paper_id": "1901.04899",
+    "length": 1406,
+    "case": "A",
+    "answer_type": "extractive",
+    "id_sha256": "02941a550acfc97d3bdfd9058bb976f720b6db126827a462bf1949a883fe5906"
+  },
+  {
+    "question_id": "586566de02abdf20b7bfd0d5a43ba93cb02795c3",
+    "paper_id": "1804.08094",
+    "length": 2149,
+    "case": "A",
+    "answer_type": "extractive",
+    "id_sha256": "0455e35ebc337752e10a1cac5f9c7bf23d6b42492f6da4f7fd4eda75a7524323"
+  },
+  {
+    "question_id": "b921a1771ed0ba9dbeff9da000336ecf2bb38322",
+    "paper_id": "1907.08501",
+    "length": 2165,
+    "case": "U",
+    "answer_type": "unanswerable",
+    "id_sha256": "04e1606d5e033b14e28f887790c4deec6daaaa534482ef2ddaf7c4555ecdd468"
+  },
+  {
+    "question_id": "6cdd61ebf84aa742155f4554456cc3233b6ae2bf",
+    "paper_id": "2004.03034",
+    "length": 2220,
+    "case": "A",
+    "answer_type": "extractive",
+    "id_sha256": "08979424c0ba32a9a6559c22a6d80e1adfc011f2e6d8a1b309d79a4f548daa86"
+  },
+  {
+    "question_id": "e4a19b91b57c006a9086ae07f2d6d6471a8cf0ce",
+    "paper_id": "1708.05873",
+    "length": 2179,
+    "case": "A",
+    "answer_type": "free_form",
+    "id_sha256": "09b676efd7adef5e4c63bdcc17911eb5f7702a195f61fd69efcc8051f8d4b981"
+  },
+  {
+    "question_id": "0457242fb2ec33446799de229ff37eaad9932f2a",
+    "paper_id": "2003.04967",
+    "length": 2130,
+    "case": "A",
+    "answer_type": "free_form",
+    "id_sha256": "0a35a7806512c2b8dfbe92eb48ad67a7c4dff2668833ac8ea34100a71bb5f9d2"
+  }
+]

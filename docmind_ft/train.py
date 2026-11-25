@@ -55,11 +55,32 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--resume-from", type=Path, default=None, help="Resume from checkpoint directory"
     )
     parser.add_argument(
+        "--data",
+        type=Path,
+        default=REPO_ROOT / "data" / "train.jsonl",
+        help="Training JSONL (default: data/train.jsonl)",
+    )
+    parser.add_argument(
+        "--no-final-eval",
+        action="store_true",
+        help="Skip loading the dev-loss eval set (no final eval)",
+    )
+    parser.add_argument(
         "--check-only",
         action="store_true",
         help="CPU-only structural check; no model loading or training",
     )
     return parser.parse_args(argv)
+
+
+def eval_strategy_for(eval_dataset, no_final_eval: bool) -> str:
+    """'steps' only when an eval dataset is loaded and final eval is not disabled."""
+    return "no" if no_final_eval or eval_dataset is None else "steps"
+
+
+def eval_on_start_for(cfg: dict) -> bool:
+    """SFTConfig.eval_on_start passthrough (optional config key, default False)."""
+    return bool(cfg["train"].get("eval_on_start", False))
 
 
 def load_config(config_path: Path) -> dict:
@@ -333,7 +354,7 @@ def run_i3_mask_check(
             }
         )
 
-    overall_ok = all_ok and len(results) == n_examples
+    overall_ok = all_ok and len(results) == sample_size
     passed = sum(1 for r in results if r["ok"])
     failed = sum(1 for r in results if not r["ok"])
     exit_code = 0 if overall_ok else 1
@@ -358,6 +379,7 @@ def write_model_metadata(
     lib_versions: dict,
     git_commit: str,
     seed: int,
+    peak_vram_gb: float = 0.0,
 ) -> None:
     """Write model_metadata.json to the checkpoint directory."""
     metadata_path.parent.mkdir(parents=True, exist_ok=True)
@@ -380,6 +402,7 @@ def write_model_metadata(
         "library_versions": lib_versions,
         "git_commit": git_commit,
         "seed": seed,
+        "peak_vram_gb": peak_vram_gb,
     }
     with metadata_path.open("w", encoding="utf-8", newline="\n") as f:
         json.dump(meta, f, indent=2, ensure_ascii=False, default=str)
@@ -431,8 +454,9 @@ class LossHeartbeatCallback(TrainerCallback):
         if not checkpoint_dir.is_dir():
             return None
         metadata_path = checkpoint_dir / "model_metadata.json"
+        payload = {**self.metadata, "peak_vram_gb": self.peak_vram_gb}
         with metadata_path.open("w", encoding="utf-8", newline="\n") as handle:
-            json.dump(self.metadata, handle, indent=2, ensure_ascii=False, default=str)
+            json.dump(payload, handle, indent=2, ensure_ascii=False, default=str)
         return None
 
     def on_epoch_end(self, args, state, control, **kwargs):
@@ -531,7 +555,7 @@ def main() -> int:
             return 1
 
         # --- I2 token-length check on real train.jsonl ---
-        print("\n--- I2: Token-Length Statistics (real data) ---")
+        print(f"\n--- I2: Token-Length Statistics ({args.data.name}) ---")
         try:
             import transformers
 
@@ -541,7 +565,7 @@ def main() -> int:
         except Exception:
             tokenizer = transformers.AutoTokenizer.from_pretrained(model_id, revision=revision)
 
-        i2_result = run_i2_check(tokenizer, REPO_ROOT / "data" / "train.jsonl", max_length)
+        i2_result = run_i2_check(tokenizer, args.data, max_length)
         print(f"  rows total:    {i2_result['rows_total']}")
         print(f"  rows valid:    {i2_result['rows_valid']}")
         print(f"  rows dropped:  {i2_result['rows_dropped']}")
@@ -552,10 +576,10 @@ def main() -> int:
             print("  I2: FAIL (< 0.99 fraction valid)")
 
         # --- I3 mask test on 20 real examples ---
-        print("\n--- I3: Mask Test (20 real examples, seed=20261207) ---")
+        print(f"\n--- I3: Mask Test (up to 20 real examples, seed={seed}) ---")
         i3_result = run_i3_mask_check(
             tokenizer,
-            REPO_ROOT / "data" / "train.jsonl",
+            args.data,
             n_examples=20,
             seed=seed,
             max_length=max_length,
@@ -565,7 +589,7 @@ def main() -> int:
         print(f"  passed:    {i3_result['passed']}")
         print(f"  failed:    {i3_result['failed']}")
         if i3_result["ok"]:
-            print("  I3: PASS (all 20 examples OK)")
+            print(f"  I3: PASS (all {i3_result['n_tested']} examples OK)")
         else:
             print("  I3: FAIL")
 
@@ -624,9 +648,7 @@ def main() -> int:
     # Pre-tokenize the dataset through build_example
     import datasets
 
-    dataset = datasets.load_dataset(
-        "json", data_files=str(REPO_ROOT / "data" / "train.jsonl"), split="train"
-    )
+    dataset = datasets.load_dataset("json", data_files=str(args.data), split="train")
     original_len = len(dataset)
 
     def _tokenize_fn(example):
@@ -666,7 +688,9 @@ def main() -> int:
     # scripts/build_dev_loss.py), pre-tokenized through the same build_example.
     dev_loss_path = REPO_ROOT / "data" / "dev_loss.jsonl"
     eval_dataset = None
-    if dev_loss_path.is_file():
+    if args.no_final_eval:
+        print("Final eval disabled (--no-final-eval); eval_strategy=no")
+    elif dev_loss_path.is_file():
         eval_dataset = datasets.load_dataset("json", data_files=str(dev_loss_path), split="train")
         eval_dataset = eval_dataset.map(_tokenize_fn, batched=False)
         eval_dataset = eval_dataset.filter(lambda ex: ex.get("length_ok", False))
@@ -726,7 +750,7 @@ def main() -> int:
     # completion_only_loss is deliberately NOT passed: with skip_prepare_dataset
     # the trainer uses our labels as-is, and they already encode the mask
     # (-100 on prompt tokens, verified by the I3 gate).
-    eval_strategy = "steps" if eval_dataset is not None else "no"
+    eval_strategy = eval_strategy_for(eval_dataset, args.no_final_eval)
     warmup_steps = warmup_steps_for(
         len(dataset),
         cfg["train"]["per_device_train_batch_size"] * cfg["train"]["gradient_accumulation_steps"],
@@ -750,6 +774,7 @@ def main() -> int:
         optim=cfg["train"]["optim"],
         logging_steps=cfg["train"]["logging_steps"],
         eval_strategy=eval_strategy,
+        eval_on_start=eval_on_start_for(cfg),
         eval_steps=cfg["train"].get("eval_steps", 100),
         save_steps=cfg["train"].get("save_steps", 100),
         save_total_limit=cfg["train"].get("save_total_limit", 3),
@@ -767,7 +792,7 @@ def main() -> int:
     from dataclasses import asdict
 
     lora_config_dict = asdict(model.peft_config["default"])
-    data_hash = sha256_file(REPO_ROOT / "data" / "train.jsonl")
+    data_hash = sha256_file(args.data)
     metadata = {
         "base_id": model_id,
         "revision": revision,
@@ -796,10 +821,16 @@ def main() -> int:
 
     # --- Train ---
     checkpoint_path = args.resume_from if args.resume_from else None
+    # Copy model config from local snapshot to output dir to make save network-independent
+    import shutil
+
+    config_src = Path(snapshot_dir) / "config.json"
+    config_dst = args.output_dir / "config.json"
+    if config_src.is_file() and not config_dst.is_file():
+        shutil.copy2(str(config_src), str(config_dst))
     trainer.train(resume_from_checkpoint=checkpoint_path)
     trainer.save_model()  # save the final adapter
-    tokenizer.save_pretrained(args.output_dir)
-
+    tokenizer.save_pretrained(args.output_dir)  # save tokenizer after trainer
     # Write model_metadata.json into the run directory (the per-checkpoint
     # copies were written by the callback's on_save during training).
     write_model_metadata(
@@ -813,6 +844,7 @@ def main() -> int:
         lib_versions=metadata["library_versions"],
         git_commit=metadata["git_commit"],
         seed=metadata["seed"],
+        peak_vram_gb=callback.peak_vram_gb,
     )
 
     print(f"\nTraining complete. Checkpoint saved to {args.output_dir}")

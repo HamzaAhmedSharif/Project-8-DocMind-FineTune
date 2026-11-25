@@ -46,18 +46,57 @@ def test_parse_args_resume_from():
     assert ns.resume_from is not None
 
 
+def test_parse_args_data_default():
+    """--data defaults to data/train.jsonl; --no-final-eval defaults to False."""
+    ns = parse_args(["--config", "configs/train_main.yaml"])
+    assert ns.data == REPO_ROOT / "data" / "train.jsonl"
+    assert ns.no_final_eval is False
+
+
+def test_parse_args_data_override():
+    """--data is honoured for probe/learn files."""
+    ns = parse_args(["--config", "configs/train_probe.yaml", "--data", "data/probe_short6.jsonl"])
+    assert ns.data == Path("data/probe_short6.jsonl")
+
+
+def test_no_final_eval_flag():
+    """--no-final-eval sets the flag and forces eval_strategy=no."""
+    from docmind_ft.train import eval_strategy_for
+
+    ns = parse_args(["--config", "configs/train_main.yaml", "--no-final-eval"])
+    assert ns.no_final_eval is True
+    assert eval_strategy_for(object(), ns.no_final_eval) == "no"
+
+
+def test_eval_strategy_for():
+    """Strategy is 'steps' only with an eval set and final eval enabled."""
+    from docmind_ft.train import eval_strategy_for
+
+    assert eval_strategy_for(None, False) == "no"
+    assert eval_strategy_for(object(), False) == "steps"
+    assert eval_strategy_for(object(), True) == "no"
+
+
+def test_eval_on_start_for():
+    """eval_on_start is read from the train section, default False."""
+    from docmind_ft.train import eval_on_start_for
+
+    assert eval_on_start_for({"train": {}}) is False
+    assert eval_on_start_for({"train": {"eval_on_start": True}}) is True
+
+
 def test_load_config_valid():
     """Valid config YAML loads with all expected top-level keys."""
     cfg = load_config(REPO_ROOT / "configs" / "train_main.yaml")
     expected_top = {"base_model", "revision", "seed", "quant", "lora", "train"}
-    assert expected_top <= set(cfg.keys()), (
-        f"Missing top-level keys: {expected_top - set(cfg.keys())}"
-    )
+    assert expected_top <= set(
+        cfg.keys()
+    ), f"Missing top-level keys: {expected_top - set(cfg.keys())}"
     # lora sub-keys
     lora_expected = {"r", "alpha", "dropout", "bias", "task_type", "target_modules"}
-    assert lora_expected <= set(cfg["lora"].keys()), (
-        f"Missing lora keys: {lora_expected - set(cfg['lora'].keys())}"
-    )
+    assert lora_expected <= set(
+        cfg["lora"].keys()
+    ), f"Missing lora keys: {lora_expected - set(cfg['lora'].keys())}"
     # train sub-keys
     train_expected = {
         "epochs",
@@ -74,9 +113,9 @@ def test_load_config_valid():
         "completion_only_loss",
         "logging_steps",
     }
-    assert train_expected <= set(cfg["train"].keys()), (
-        f"Missing train keys: {train_expected - set(cfg['train'].keys())}"
-    )
+    assert train_expected <= set(
+        cfg["train"].keys()
+    ), f"Missing train keys: {train_expected - set(cfg['train'].keys())}"
 
 
 def test_load_config_nonexistent():
@@ -146,9 +185,9 @@ def test_build_example_conversational():
         tokenizer, prompt_msgs, completion_msgs, max_length=3072
     )
     # Alignment by construction: input_ids and labels must have the same length
-    assert len(input_ids) == len(labels), (
-        f"input_ids length {len(input_ids)} != labels length {len(labels)}"
-    )
+    assert len(input_ids) == len(
+        labels
+    ), f"input_ids length {len(input_ids)} != labels length {len(labels)}"
     # Prompt tokens must have label -100
     has_negative_100 = any(la == -100 for la in labels)
     # Completion tokens must have real labels (not -100)
@@ -297,6 +336,7 @@ def test_loss_callback_on_save_writes_metadata(tmp_path):
 
     metadata = {"base_id": "x", "seed": 20261207}
     callback = LossHeartbeatCallback(tmp_path, log_steps=10, metadata=metadata)
+    callback.peak_vram_gb = 7.91
     checkpoint = tmp_path / "checkpoint-10"
     checkpoint.mkdir()
     args = SimpleNamespace(output_dir=str(tmp_path))
@@ -304,7 +344,7 @@ def test_loss_callback_on_save_writes_metadata(tmp_path):
     callback.on_save(args, state, None)
     callback.on_train_end(args, state, None)
     saved = json.loads((checkpoint / "model_metadata.json").read_text(encoding="utf-8"))
-    assert saved == metadata
+    assert saved == {**metadata, "peak_vram_gb": 7.91}
 
 
 def test_warmup_steps_for_full_run():
