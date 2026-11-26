@@ -9,7 +9,6 @@ import pytest
 import requests
 
 from scripts.fetch_heldout import (
-    MANIFEST_PATH,
     FetchError,
     fetch_pdf,
     load_manifest,
@@ -71,14 +70,17 @@ def _write_manifest(path: Path, papers: list[dict]) -> Path:
     return path
 
 
-def test_manifest_has_24_papers_with_required_fields() -> None:
-    papers = load_manifest(MANIFEST_PATH)
+def test_manifest_has_24_papers_with_required_fields(tmp_path: Path) -> None:
+    papers = [_paper(f"2601.{i:05d}") for i in range(24)]
+    path = _write_manifest(tmp_path / "manifest.json", papers)
 
-    assert len(papers) == 24
+    loaded = load_manifest(path)
+
+    assert len(loaded) == 24
     required = {"arxiv_id", "title", "primary_category", "pdf_url", "sha256", "pages"}
-    assert all(required <= set(paper) for paper in papers)
-    assert len({paper["arxiv_id"] for paper in papers}) == 24
-    assert all(len(paper["sha256"]) == 64 for paper in papers)
+    assert all(required <= set(paper) for paper in loaded)
+    assert len({paper["arxiv_id"] for paper in loaded}) == 24
+    assert all(len(paper["sha256"]) == 64 for paper in loaded)
 
 
 def test_manifest_rejects_missing_field(tmp_path: Path) -> None:
