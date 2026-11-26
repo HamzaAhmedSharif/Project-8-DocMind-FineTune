@@ -1,0 +1,2429 @@
+{
+  "dataset": "allenai/ai2_arc, config ARC-Easy, test split",
+  "n_sample": 200,
+  "seed": 20261207,
+  "method": "zero-shot multiple choice by option log-likelihood as continuation",
+  "per_model": {
+    "B0": {
+      "accuracy": 0.73,
+      "n": 200
+    },
+    "FT-main": {
+      "accuracy": 0.765,
+      "n": 200
+    }
+  },
+  "difference_ft_main_minus_b0": {
+    "point": 0.035,
+    "ci_low": 0.0,
+    "ci_high": 0.07,
+    "n_questions": 200,
+    "drop": -0.03500000000000003
+  },
+  "records": {
+    "B0": [
+      {
+        "id": "Mercury_SC_401119",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7228393",
+        "gold": "D",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "MEA_2014_5_3",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_406672",
+        "gold": "C",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_400704",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2008_8_39",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2013_4_7",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MCAS_2004_8_22",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MSA_2015_5_37",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_192343",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2007_8_6",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_400857",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7267855",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MCAS_2005_9_16",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7043873",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7015978",
+        "gold": "D",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "TIMSS_2003_8_pg99",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_413637",
+        "gold": "D",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "ACTAAP_2010_7_8",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_2003_4_pg8",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2011_8_17696",
+        "gold": "D",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_401313",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_400376",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2008_8_16",
+        "gold": "2",
+        "pred": "2",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7251003",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7238910",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_186568",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2011_8_17692",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7264145",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7211505",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7217333",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_400523",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7024745",
+        "gold": "D",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MCAS_2003_8_5",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_405469",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "AIMS_2009_8_26",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7176208",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_406674",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7213675",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_400183",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_408991",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_2003_4_pg35",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7033635",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7080955",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7032690",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7013843",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7086765",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7175805",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2008_8_13",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2005_5_14",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7270043",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2010_8_7",
+        "gold": "3",
+        "pred": "3",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2005_5_10",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "NYSEDREGENTS_2008_8_37",
+        "gold": "2",
+        "pred": "2",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7213308",
+        "gold": "C",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "MSA_2012_5_16",
+        "gold": "B",
+        "pred": "D",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_413009",
+        "gold": "A",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7093013",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_401760",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_416579",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_404899",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_402082",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7030783",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_1995_8_M10",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_411782",
+        "gold": "D",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MDSA_2011_5_35",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7001435",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "FCAT_2008_5_7",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "NCEOGA_2013_5_6",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MEA_2016_8_19",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2008_4_24",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_409153",
+        "gold": "D",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_191503",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7056665",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7239435",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7180618",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7223090",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2015_8_19",
+        "gold": "3",
+        "pred": "3",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2008_4_25",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_184240",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "MEA_2014_5_8",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2005_9_9",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_178710",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7009818",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_407219",
+        "gold": "B",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7143080",
+        "gold": "B",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_415684",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7085435",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7198993",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "VASoL_2008_5_25",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_LBS10270",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7038465",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "CSZ20823",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "MEA_2013_5_7",
+        "gold": "A",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_412714",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_409143",
+        "gold": "B",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_408851",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "TIMSS_2011_4_pg51",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2010_8_12003",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_402070",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_178815",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7024675",
+        "gold": "D",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "NYSEDREGENTS_2013_8_37",
+        "gold": "2",
+        "pred": "1",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_408424",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_1999_4_10",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "LEAP_2005_4_10267",
+        "gold": "D",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "NYSEDREGENTS_2015_8_30",
+        "gold": "4",
+        "pred": "4",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2007_5_51",
+        "gold": "C",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_184888",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2010_8_34",
+        "gold": "3",
+        "pred": "1",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_LBS10901",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7216913",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_400177",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7185185",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7166950",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "ACTAAP_2009_7_6",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7207183",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7214585",
+        "gold": "D",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MCAS_2011_8_17681",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2008_8_24",
+        "gold": "3",
+        "pred": "2",
+        "correct": false
+      },
+      {
+        "id": "Mercury_411070",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7212853",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_416161",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "LEAP__5_10308",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2010_5_14",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7083773",
+        "gold": "B",
+        "pred": "D",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7263515",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7230178",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2013_4_10",
+        "gold": "A",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_407450",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7044555",
+        "gold": "D",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7238928",
+        "gold": "D",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7122973",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_184643",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7222408",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7005058",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "MEAP_2005_8_15",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_407608",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7015663",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7033530",
+        "gold": "A",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7210630",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "AKDE&ED_2008_8_51",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "VASoL_2007_5_12",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "LEAP_2006_4_10275",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7167038",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "MEA_2014_8_2",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_400089",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2002_8_14",
+        "gold": "A",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7170853",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_400808",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "NAEP_2009_4_S11+1",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_2003_4_pg17",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7220465",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_403937",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7074953",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2002_5_7",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_407359",
+        "gold": "D",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_405999",
+        "gold": "A",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7080465",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_408243",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_400758",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "NYSEDREGENTS_2015_8_16",
+        "gold": "4",
+        "pred": "4",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7094815",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "MCAS_2003_5_20",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7075128",
+        "gold": "C",
+        "pred": "D",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_409157",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2005_8_21",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_402036",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2007_8_4",
+        "gold": "A",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MEAP_2004_8_48",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2015_8_6",
+        "gold": "1",
+        "pred": "1",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_LBS10619",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2000_8_24",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7283693",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2012_5_23619",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "OHAT_2008_8_29",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2008_5_29",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7180705",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "LEAP_2003_8_10394",
+        "gold": "D",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7213045",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_400752",
+        "gold": "B",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7205468",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_1995_8_L3",
+        "gold": "D",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_LBS10064",
+        "gold": "D",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "TIMSS_2003_4_pg21",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_415369",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7018340",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "VASoL_2009_5_3",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2012_4_12",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7083563",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_405056",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2006_9_5",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7179288",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7107993",
+        "gold": "C",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_185115",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2004_9_6-v1",
+        "gold": "C",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_401143",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7212153",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2010_4_27",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7271723",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      }
+    ],
+    "FT-main": [
+      {
+        "id": "Mercury_SC_401119",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7228393",
+        "gold": "D",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "MEA_2014_5_3",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_406672",
+        "gold": "C",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_400704",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2008_8_39",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2013_4_7",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MCAS_2004_8_22",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MSA_2015_5_37",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_192343",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2007_8_6",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_400857",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7267855",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MCAS_2005_9_16",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7043873",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7015978",
+        "gold": "D",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "TIMSS_2003_8_pg99",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_413637",
+        "gold": "D",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "ACTAAP_2010_7_8",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_2003_4_pg8",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2011_8_17696",
+        "gold": "D",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_401313",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_400376",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2008_8_16",
+        "gold": "2",
+        "pred": "2",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7251003",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7238910",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_186568",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2011_8_17692",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7264145",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7211505",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7217333",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_400523",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7024745",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2003_8_5",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_405469",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "AIMS_2009_8_26",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7176208",
+        "gold": "B",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_406674",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7213675",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_400183",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_408991",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_2003_4_pg35",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7033635",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7080955",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7032690",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7013843",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7086765",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7175805",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2008_8_13",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2005_5_14",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7270043",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2010_8_7",
+        "gold": "3",
+        "pred": "3",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2005_5_10",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "NYSEDREGENTS_2008_8_37",
+        "gold": "2",
+        "pred": "2",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7213308",
+        "gold": "C",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "MSA_2012_5_16",
+        "gold": "B",
+        "pred": "D",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_413009",
+        "gold": "A",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7093013",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_401760",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_416579",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_404899",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_402082",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7030783",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_1995_8_M10",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_411782",
+        "gold": "D",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MDSA_2011_5_35",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7001435",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "FCAT_2008_5_7",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "NCEOGA_2013_5_6",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MEA_2016_8_19",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2008_4_24",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_409153",
+        "gold": "D",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_191503",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7056665",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7239435",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7180618",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7223090",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2015_8_19",
+        "gold": "3",
+        "pred": "3",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2008_4_25",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_184240",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "MEA_2014_5_8",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2005_9_9",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_178710",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7009818",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_407219",
+        "gold": "B",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7143080",
+        "gold": "B",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_415684",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7085435",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7198993",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "VASoL_2008_5_25",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_LBS10270",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7038465",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "CSZ20823",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "MEA_2013_5_7",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_412714",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_409143",
+        "gold": "B",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_408851",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "TIMSS_2011_4_pg51",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2010_8_12003",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_402070",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_178815",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7024675",
+        "gold": "D",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "NYSEDREGENTS_2013_8_37",
+        "gold": "2",
+        "pred": "2",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_408424",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_1999_4_10",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "LEAP_2005_4_10267",
+        "gold": "D",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "NYSEDREGENTS_2015_8_30",
+        "gold": "4",
+        "pred": "4",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2007_5_51",
+        "gold": "C",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_184888",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2010_8_34",
+        "gold": "3",
+        "pred": "3",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_LBS10901",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7216913",
+        "gold": "D",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_400177",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7185185",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7166950",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "ACTAAP_2009_7_6",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7207183",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7214585",
+        "gold": "D",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MCAS_2011_8_17681",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2008_8_24",
+        "gold": "3",
+        "pred": "2",
+        "correct": false
+      },
+      {
+        "id": "Mercury_411070",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7212853",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_416161",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "LEAP__5_10308",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2010_5_14",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7083773",
+        "gold": "B",
+        "pred": "D",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7263515",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7230178",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2013_4_10",
+        "gold": "A",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_407450",
+        "gold": "C",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7044555",
+        "gold": "D",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7238928",
+        "gold": "D",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7122973",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_184643",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7222408",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7005058",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "MEAP_2005_8_15",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_407608",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7015663",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7033530",
+        "gold": "A",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7210630",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "AKDE&ED_2008_8_51",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "VASoL_2007_5_12",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "LEAP_2006_4_10275",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7167038",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "MEA_2014_8_2",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_400089",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2002_8_14",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7170853",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_400808",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "NAEP_2009_4_S11+1",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_2003_4_pg17",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7220465",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_403937",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7074953",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2002_5_7",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_407359",
+        "gold": "D",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_405999",
+        "gold": "A",
+        "pred": "C",
+        "correct": false
+      },
+      {
+        "id": "Mercury_7080465",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_408243",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_400758",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2015_8_16",
+        "gold": "4",
+        "pred": "4",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7094815",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "MCAS_2003_5_20",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7075128",
+        "gold": "C",
+        "pred": "D",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_409157",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2005_8_21",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_402036",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MDSA_2007_8_4",
+        "gold": "A",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "MEAP_2004_8_48",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2015_8_6",
+        "gold": "1",
+        "pred": "1",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_LBS10619",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2000_8_24",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7283693",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2012_5_23619",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "OHAT_2008_8_29",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "MDSA_2008_5_29",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7180705",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "LEAP_2003_8_10394",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7213045",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_400752",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7205468",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_1995_8_L3",
+        "gold": "D",
+        "pred": "B",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_LBS10064",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "TIMSS_2003_4_pg21",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_SC_415369",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7018340",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "VASoL_2009_5_3",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2012_4_12",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7083563",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_405056",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2006_9_5",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7179288",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7107993",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_185115",
+        "gold": "B",
+        "pred": "B",
+        "correct": true
+      },
+      {
+        "id": "MCAS_2004_9_6-v1",
+        "gold": "C",
+        "pred": "A",
+        "correct": false
+      },
+      {
+        "id": "Mercury_SC_401143",
+        "gold": "C",
+        "pred": "C",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7212153",
+        "gold": "D",
+        "pred": "D",
+        "correct": true
+      },
+      {
+        "id": "NYSEDREGENTS_2010_4_27",
+        "gold": "A",
+        "pred": "A",
+        "correct": true
+      },
+      {
+        "id": "Mercury_7271723",
+        "gold": "B",
+        "pred": "A",
+        "correct": false
+      }
+    ]
+  }
+}

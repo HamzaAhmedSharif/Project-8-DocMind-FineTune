@@ -750,3 +750,19 @@ to fit with ~0.7 GB headroom). F4 sizing unchanged: 180 steps at GA 16,
 (data/train_f4_2816.jsonl, --data flag); it is a 6-8 h overnight job and
 resume is verified (torch 2.6.0), so a crash would resume from the last
 checkpoint (save_steps 2).
+
+## Decision: F5 sealed test evaluation outcome (2026-11-27)
+
+FT-main evaluated once on the sealed sets (Q-TEST 400, HOLD 96, PAPER16 16).
+Paper-cluster bootstrap (seed 20261207, 10,000 resamples).
+HY1 confirmed (format_valid 0.998, citation_valid_share 1.000, format
+improvement +0.10 CI [0.070, 0.133]).
+HY2 refuted (answer_f1 +0.027 < 0.05, CI [-0.004, 0.058]).
+HY3 refuted (abstain_acc +0.409 but over_refusal 0.143 > 0.10).
+HY4 refuted (HOLD keyfact_cov -0.036, PAPER16 0.0).
+HY5 confirmed (red-team 0/15 extra, ARC-Easy improved +0.035).
+The 120B reference R is not a format/keyfact ceiling on HOLD
+(format_valid 0.115, keyfact_cov 0.576 < B1 0.706).
+FT-nodistill / FT-data25 comparisons unavailable (never trained) -- recorded,
+not fabricated. I7 PASS (11/11 ledger hashes match). Recompute MATCH for both
+output files. Verdict: PASS-WITH-NOTES. HY6 is F6.3. [H9] pending (Hamza wakes).

@@ -1,0 +1,94 @@
+{
+  "HY1": {
+    "verdict": "confirmed",
+    "citation_valid_share_ft_main_qtest": 1.0,
+    "format_valid_ft_main_qtest": 0.9975,
+    "format_valid_improvement_vs_b1": 0.1,
+    "format_valid_improvement_ci": [
+      0.06971153846153846,
+      0.1326814918611793
+    ],
+    "thresholds": {
+      "citation_valid_share": 0.97,
+      "format_valid": 0.97,
+      "improvement_ci_lower_gt": 0
+    },
+    "comparator": "B1 on Q-TEST"
+  },
+  "HY2": {
+    "verdict": "refuted",
+    "answer_f1_ft_main_qtest": 0.3381241499137922,
+    "answer_f1_b1_qtest": 0.31079817005152527,
+    "answer_f1_delta": 0.02732597986226694,
+    "answer_f1_delta_ci": [
+      -0.004186575991112344,
+      0.05785794724106615
+    ],
+    "thresholds": {
+      "answer_f1_delta": 0.05,
+      "ci_lower_gt": 0
+    },
+    "comparator": "B1 on Q-TEST"
+  },
+  "HY3": {
+    "verdict": "refuted",
+    "abstain_acc_ft_main_qtest": 0.6363636363636364,
+    "abstain_acc_b1_qtest": 0.22727272727272727,
+    "abstain_acc_delta": 0.4090909090909091,
+    "abstain_acc_delta_ci": [
+      0.16666666666666666,
+      0.6666666666666666
+    ],
+    "over_refusal_ft_main_qtest": 0.14329268292682926,
+    "thresholds": {
+      "abstain_acc_delta": 0.15,
+      "over_refusal_max": 0.1
+    },
+    "comparator": "B1 on Q-TEST"
+  },
+  "HY4": {
+    "verdict": "refuted",
+    "format_valid_min_ft_main_hold_paper16": 1.0,
+    "keyfact_cov_delta_hold": -0.03571428571428571,
+    "keyfact_cov_delta_hold_ci": [
+      -0.10846679400528947,
+      0.024691358024691357
+    ],
+    "keyfact_cov_delta_paper16": 0.0,
+    "keyfact_cov_delta_paper16_ci": [
+      0.0,
+      0.0
+    ],
+    "thresholds": {
+      "format_valid_min": 0.95,
+      "keyfact_cov_delta": 0.05
+    },
+    "comparator": "B1 on HOLD and PAPER16"
+  },
+  "HY5": {
+    "verdict": "confirmed",
+    "arc_easy_b0_accuracy": 0.73,
+    "arc_easy_ft_main_accuracy": 0.765,
+    "arc_easy_drop_b0_minus_ft_main": -0.03500000000000003,
+    "arc_easy_diff_ci": [
+      0.0,
+      0.07
+    ],
+    "redteam_b0_succeeded": 0,
+    "redteam_ft_main_succeeded": 0,
+    "redteam_extra_successes_ft_main_vs_b0": 0,
+    "thresholds": {
+      "arc_easy_drop_max": 0.03,
+      "redteam_extra_max": 2
+    },
+    "comparator": "B0 (base model)"
+  },
+  "HY6": {
+    "verdict": "not-evaluated-here",
+    "note": "Deployment fidelity; evaluated in F6.3.",
+    "thresholds": {
+      "answer_f1_abs_diff_max": 0.03,
+      "format_valid_abs_diff_max": 0.02
+    }
+  }
+}

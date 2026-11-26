@@ -1,0 +1,436 @@
+{
+  "seed": 20261207,
+  "qtest": {
+    "n_questions": 400,
+    "n_failures": 281,
+    "counts": {
+      "over_refusal": 47,
+      "other": 21,
+      "citation_error": 66,
+      "wrong_answer": 118,
+      "retrieval_miss": 28,
+      "format_error": 1
+    },
+    "sampled": [
+      {
+        "question_id": "4f57ac24f3f4689a2f885715cd84b7d867fe3f12",
+        "paper_id": "1908.06893",
+        "category": "retrieval_miss",
+        "answer_f1": 1.0,
+        "output": "Yes, they compare their system's output against a small set of automatically generated emails provided by the authors of BIBREF6 [c6]."
+      },
+      {
+        "question_id": "3614c1f1435b7c1fd1f7f0041219eebf5bcff473",
+        "paper_id": "1612.09535",
+        "category": "over_refusal",
+        "answer_f1": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "4c7ec282697f4f6646eb1c19f46bbaf8670b0de6",
+        "paper_id": "1908.05908",
+        "category": "wrong_answer",
+        "answer_f1": 0.4167,
+        "output": "The weak supervision signal used in the Baidu Baike corpus is the title of each sample as a pseudo label [c1]. This is because the samples are auto-crawled without actual entity labels, and the title is considered as a pseudo label for NER pre-training [c4]."
+      },
+      {
+        "question_id": "4c40fa01f626def0b69d1cb7bf9181b574ff6382",
+        "paper_id": "1908.06024",
+        "category": "format_error",
+        "answer_f1": 0.24,
+        "output": "The datasets used in this work include data-wiki-att, data-wiki-agg, data-fox-news, data-bully, data-gazzetta, data-twitter-wh, data-twitter-f, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-dj, data-yahoo-fin-d"
+      },
+      {
+        "question_id": "952fe4fbf4e0bcfcf44fab2dbd3ed85dd961eff3",
+        "paper_id": "1912.07940",
+        "category": "over_refusal",
+        "answer_f1": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "8ffae517bc0efa453b7e316d41bd9f1b6679b158",
+        "paper_id": "1909.05372",
+        "category": "citation_error",
+        "answer_f1": 0.2222,
+        "output": "Applications in Overton are presented as a set of tasks and data payloads, where the tasks capture the model's objectives and the payloads represent the data sources [c6]. The schema defines the structure of the data and tasks, allowing Overton to compile the inference code and loss functions for each task [c7]."
+      },
+      {
+        "question_id": "8c46a26f9b0b41c656b5b55142d491600663defa",
+        "paper_id": "1811.04791",
+        "category": "wrong_answer",
+        "answer_f1": 0.4286,
+        "output": "The dataset used includes the GlobalPhone corpus of speech read from news articles BIBREF20, the Buckeye corpus BIBREF38, and the NCHLT corpus BIBREF39 [c4]."
+      },
+      {
+        "question_id": "2ba2ff6c21a16bd295b07af1ef635b3b4c5bd17e",
+        "paper_id": "1912.04979",
+        "category": "retrieval_miss",
+        "answer_f1": 0.1875,
+        "output": "The baselines used include a single-channel beamforming followed by speaker diarization and speech recognition, and a single-channel beamforming followed by speaker diarization and speech recognition [c6]."
+      },
+      {
+        "question_id": "08c0d4db14773cbed8a63e69381a2265e85f8765",
+        "paper_id": "1901.05389",
+        "category": "wrong_answer",
+        "answer_f1": 0.1,
+        "output": "Professional profiles are crawled from LinkedIn, as the study mentions that they used LinkedIn BIBREF30 for collecting professional profile descriptions [c1]."
+      },
+      {
+        "question_id": "2974237446d04da33b78ce6d22a477cdf80877b7",
+        "paper_id": "1611.06322",
+        "category": "wrong_answer",
+        "answer_f1": 0.4615,
+        "output": "Rumours are defined as information of doubtful or unconfirmed truth [c2]. This definition is based on the Cambridge dictionary's definition of a rumour [c2]."
+      },
+      {
+        "question_id": "919681faa9731057b3fae5052b7da598abd3e04b",
+        "paper_id": "2004.04498",
+        "category": "wrong_answer",
+        "answer_f1": 0.2222,
+        "output": "The metrics used to measure bias reduction include $\\Delta G$ and $\\Delta S$ for masculine/feminine bias and pro/anti-stereotypical bias, respectively [c4]. These metrics are used to evaluate the extent of gender bias in machine translation models [c4]."
+      },
+      {
+        "question_id": "4d5b74499804ea5bc5520beb88d0f9816f67205a",
+        "paper_id": "1907.04072",
+        "category": "wrong_answer",
+        "answer_f1": 0.0741,
+        "output": "The baseline they compare to is state-of-the-art Twitter spam detection methods [c4]."
+      },
+      {
+        "question_id": "fcb0ac1934e2fd9f58f4b459e6853999a27844f9",
+        "paper_id": "2004.02214",
+        "category": "other",
+        "answer_f1": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "6c8dc31a199b155e73c84173816c1e252137a0af",
+        "paper_id": "2003.07568",
+        "category": "over_refusal",
+        "answer_f1": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "058b6e3fdbb607fa7dbfc688628b3e13e130c35a",
+        "paper_id": "1912.00239",
+        "category": "over_refusal",
+        "answer_f1": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "636ac549cf4917c5922cd09a655abf278924c930",
+        "paper_id": "1910.03943",
+        "category": "wrong_answer",
+        "answer_f1": 0.3929,
+        "output": "The experiment was evaluated using the hits@k metric, which measures the average number of times the correct selection appears in the top k predictions [c2]. This metric was used to compare the performance of the session-only and enriched models in various scenarios, including with and without limiting the candidates to hotels within the same market [c8]."
+      },
+      {
+        "question_id": "b21f61c0f95fefdb1bdb90d51cbba4655cd59896",
+        "paper_id": "1610.00479",
+        "category": "citation_error",
+        "answer_f1": 0.0,
+        "output": "Yes, the nonsymbolic representation can represent two same strings differently depending on the context. This is supported by the fact that position embeddings capture sequence-of-ngram information, which can vary based on the context [c4]."
+      },
+      {
+        "question_id": "c138a45301713c1a9f6edafeef338ba2f99220ce",
+        "paper_id": "1912.08084",
+        "category": "wrong_answer",
+        "answer_f1": 0.3333,
+        "output": "The dataset consists of four debates, with a total of 5,415 sentences [c4]."
+      },
+      {
+        "question_id": "3e4e415e346a313f5a7c3764fe0f51c11f51b071",
+        "paper_id": "1902.10246",
+        "category": "wrong_answer",
+        "answer_f1": 0.0,
+        "output": "The model is tested on standard SemEval data that are labelled by senses from WordNet 3.0 BIBREF12 [c2]."
+      },
+      {
+        "question_id": "67672648e7ebcbef18921006e2c8787966f8cdf2",
+        "paper_id": "1901.09501",
+        "category": "retrieval_miss",
+        "answer_f1": 0.2857,
+        "output": "The competing objectives for their unsupervised method include maximizing content fidelity and minimizing style deviation [c10]."
+      },
+      {
+        "question_id": "649e77ac2ecce42ab2efa821882675b5a0c993cb",
+        "paper_id": "1606.02601",
+        "category": "over_refusal",
+        "answer_f1": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "740cc392c0c8bfadfe6b3a60c0be635c03e17f2a",
+        "paper_id": "2004.00809",
+        "category": "other",
+        "answer_f1": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "a7e03d24549961b38e15b5386d9df267900ef4c8",
+        "paper_id": "1711.11118",
+        "category": "other",
+        "answer_f1": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "d3cfbe497a30b750a8de3ea7f2cecf4753a4e1f9",
+        "paper_id": "1905.09439",
+        "category": "citation_error",
+        "answer_f1": 0.3333,
+        "output": "The word embeddings utilized for the EmoContext task are fasttext and ELMo [c6]."
+      },
+      {
+        "question_id": "d7799d26fe39302c4aff5b530aa691e8653fffe8",
+        "paper_id": "1803.09000",
+        "category": "retrieval_miss",
+        "answer_f1": 0.0741,
+        "output": "The state of the art models include the DUC-2001 dataset BIBREF6, the Inspec dataset BIBREF7, the NUS Keyphrase Corpus BIBREF10, and the ICSI Meeting Corpus (Janin et al., 2003) [c4]."
+      },
+      {
+        "question_id": "7c2c15ea3f1b1375b8aaef1103a001069d9915bb",
+        "paper_id": "1907.10676",
+        "category": "wrong_answer",
+        "answer_f1": 0.381,
+        "output": "The other obstacles to automatic translations include the lack of training data for certain domains, the difficulty in translating data from social networks with non-standard speech, and the challenges of translating morphologically rich languages [c10]."
+      },
+      {
+        "question_id": "b0edb9023f35a5a02eb8fb968e880e36233e66b3",
+        "paper_id": "1910.12477",
+        "category": "wrong_answer",
+        "answer_f1": 0.0,
+        "output": "The model achieved an F1 score of 70.45% on the test data, which is lower than the baseline model's accuracy of 75% [c10]."
+      },
+      {
+        "question_id": "42dcf1bb19b8470993c05e55413eed487b0f2559",
+        "paper_id": "1905.08067",
+        "category": "wrong_answer",
+        "answer_f1": 0.1395,
+        "output": "The propaganda material is sourced from Dabiq magazine, an online magazine published by ISIS terrorist groups [c2]. This is further supported by the context where it mentions analyzing content from Dabiq to understand linguistic cues and psychological properties associated with extremist groups [c4]."
+      },
+      {
+        "question_id": "8476d0bf5962f4ed619a7b87415ebe28c38ce296",
+        "paper_id": "1807.03674",
+        "category": "wrong_answer",
+        "answer_f1": 0.0,
+        "output": "Yes, they use machine learning. The system combines dictionary-based approaches with machine learning techniques to improve performance [c2]. Additionally, the algorithm uses techniques such as Levenshtein matching, which is a form of machine learning-inspired string matching [c8]."
+      },
+      {
+        "question_id": "8795bb1f874e5f3337710d8c3d5be49e672ab43a",
+        "paper_id": "1908.05803",
+        "category": "wrong_answer",
+        "answer_f1": 0.3636,
+        "output": "The data was obtained from a crowdsourcing platform on Mechanical Turk [c3]."
+      }
+    ]
+  },
+  "hold": {
+    "n_questions": 96,
+    "n_failures": 28,
+    "counts": {
+      "citation_error": 11,
+      "wrong_answer": 3,
+      "over_refusal": 5,
+      "retrieval_miss": 7,
+      "other": 2
+    },
+    "sampled": [
+      {
+        "question_id": "h74",
+        "paper_id": "2601.00167",
+        "category": "over_refusal",
+        "keyfact_cov": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "h43",
+        "paper_id": "2601.00510",
+        "category": "retrieval_miss",
+        "keyfact_cov": 0.0,
+        "output": "The CoT method outperforms the embedding benchmark for e-commerce query categorization because it can detect problems within a hierarchical taxonomy and provide actionable insights for improving the taxonomy structure [c4]. Additionally, the model can specify context for the query, such as user intent, which enhances targeted and contextually appropriate category mapping [c10]."
+      },
+      {
+        "question_id": "h94",
+        "paper_id": "2601.00915",
+        "category": "citation_error",
+        "keyfact_cov": 0.0,
+        "output": "The number of independent ERA5 reanalysis realizations used is 10 [c1]."
+      },
+      {
+        "question_id": "h07",
+        "paper_id": "2601.00181",
+        "category": "citation_error",
+        "keyfact_cov": 0.0,
+        "output": "Hierarchical sentence representations provide less benefit once turn-level context is available because the contextual signal within a short window is already exhausted, and the per-emotion saturation K effectively collapses toward K=0 [c8]. This is supported by the observation that both encodings show no improvement when context is added at K=5 or K=10 [c9]."
+      },
+      {
+        "question_id": "h75",
+        "paper_id": "2601.00167",
+        "category": "citation_error",
+        "keyfact_cov": 0.0,
+        "output": "Hindsight return relabeling destabilizes importance-sampling reinforcement learning for Decision Transformers because it introduces a mismatch in the conditioning variable g, where the learner conditions rollouts on a high RTG gonline for optimistic exploration, yet the achieved RTG gactual is often much lower [c2]. This inconsistency leads to unreliable importance weights and unstable updates [c6]."
+      },
+      {
+        "question_id": "h88",
+        "paper_id": "2601.00186",
+        "category": "over_refusal",
+        "keyfact_cov": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "h15",
+        "paper_id": "2601.00216",
+        "category": "citation_error",
+        "keyfact_cov": 0.0,
+        "output": "The sports-rehabilitation retrieval system uses Bayesian Evidence Tier Reranking to address the lack of evidence hierarchy in reranking and to combine the uncalibrated relevance score with evidence hierarchy [c7]. This approach integrates the evidence hierarchy principle into the reranking pipeline to optimize ranking order [c7]."
+      },
+      {
+        "question_id": "h73",
+        "paper_id": "2601.00167",
+        "category": "over_refusal",
+        "keyfact_cov": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "h83",
+        "paper_id": "2601.00175",
+        "category": "citation_error",
+        "keyfact_cov": 0.0,
+        "output": "Serum-based fibrosis indices miss many advanced fibrosis cases because they rely on a small set of laboratory parameters and do not account for sophisticated nonlinear associations or the wider set of demographics, biochemical, and clinical variables that contribute to disease progression [c5]."
+      },
+      {
+        "question_id": "h69",
+        "paper_id": "2601.00908",
+        "category": "retrieval_miss",
+        "keyfact_cov": 0.0,
+        "output": "SHAP concentration measures the mean absolute SHAP value of the j-th feature computed on validation data using TreeExplainer [c3]. This metric is defined as C = ϕ1Pp j=1 ϕj, where ϕj is the mean absolute SHAP value of the j-th feature [c3]."
+      },
+      {
+        "question_id": "h22",
+        "paper_id": "2601.00224",
+        "category": "over_refusal",
+        "keyfact_cov": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "h78",
+        "paper_id": "2601.00172",
+        "category": "other",
+        "keyfact_cov": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "h01",
+        "paper_id": "2601.00166",
+        "category": "citation_error",
+        "keyfact_cov": 0.0,
+        "output": "The legally constrained reasoning stage adds constraints such as enablement and written description requirements under 35 U.S.C. § 112(a) [c2], ensuring that the generated descriptions meet the legal standards for patentability [c4]."
+      },
+      {
+        "question_id": "h60",
+        "paper_id": "2601.01448",
+        "category": "other",
+        "keyfact_cov": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "h67",
+        "paper_id": "2601.00152",
+        "category": "retrieval_miss",
+        "keyfact_cov": 0.0,
+        "output": "Precipitation and visibility showed limited predictive power for accident severity because they were dominated by near-zero values, preventing proper study of extreme conditions [c7]. Additionally, visibility was almost always favorable, making it difficult to assess its impact on severity [c7]."
+      },
+      {
+        "question_id": "h86",
+        "paper_id": "2601.00186",
+        "category": "citation_error",
+        "keyfact_cov": 0.0,
+        "output": "The framework achieves a chrF score of 0.3123 at 1 dB SNR, which is an improvement over uniform protection [c4]."
+      },
+      {
+        "question_id": "h51",
+        "paper_id": "2601.02412",
+        "category": "citation_error",
+        "keyfact_cov": 0.0,
+        "output": "A recommender that maximizes satisfaction increases creator clustering because it focuses on recommending content that perfectly matches users' existing opinions, leading to a concentration of creators with similar opinions [c9]. This approach, known as the confirmation bias theory, was shown to result in polarized opinions and clusterization behavior [c9]."
+      },
+      {
+        "question_id": "h89",
+        "paper_id": "2601.00189",
+        "category": "over_refusal",
+        "keyfact_cov": 0.0,
+        "output": "I could not find relevant information in the indexed documents."
+      },
+      {
+        "question_id": "h59",
+        "paper_id": "2601.01448",
+        "category": "citation_error",
+        "keyfact_cov": 0.0,
+        "output": "ADAR generates negative samples instead of drawing them from the item pool to address the challenge of unreliable negative signals and limited control over negative sampling in implicit feedback recommendation [c8]. This approach allows for more precise and controllable negative training signals, enhancing the model's ability to distinguish between preferred and non-preferred items [c9]."
+      },
+      {
+        "question_id": "h23",
+        "paper_id": "2601.00224",
+        "category": "citation_error",
+        "keyfact_cov": 0.0,
+        "output": "Enterprise analytics assistants need built-in verification instead of leaving validation to users because small errors can distort KPIs or breach compliance, and current systems lack robust mechanisms for verifying that generated outputs are semantically aligned with user intent and logically executable [c5]."
+      }
+    ]
+  },
+  "b1_beats_ft_top5": [
+    {
+      "question_id": "dfd07a8e2de80c3a8d075a0f400fb13a1f1d4c60",
+      "b1_answer_f1": 1.0,
+      "ft_answer_f1": 0.0,
+      "gap": 1.0
+    },
+    {
+      "question_id": "d788076c0d19781ff3f6525bd9c05b0ef0ecd0f1",
+      "b1_answer_f1": 1.0,
+      "ft_answer_f1": 0.0,
+      "gap": 1.0
+    },
+    {
+      "question_id": "c4a3f270e942803dab9b40e5e871a2e8886ce444",
+      "b1_answer_f1": 1.0,
+      "ft_answer_f1": 0.0,
+      "gap": 1.0
+    },
+    {
+      "question_id": "bc7081aaa207de2362e0bea7bc8108d338aee36f",
+      "b1_answer_f1": 1.0,
+      "ft_answer_f1": 0.0,
+      "gap": 1.0
+    },
+    {
+      "question_id": "ae2142ee9e093ce485025168f4bcb3da4602739d",
+      "b1_answer_f1": 1.0,
+      "ft_answer_f1": 0.0,
+      "gap": 1.0
+    }
+  ],
+  "answer_length": {
+    "ft_main_qtest": 24.28,
+    "b1_qtest": 31.215,
+    "b0_qtest": 95.4675,
+    "ft_main_hold": 26.229166666666668,
+    "b1_hold": 26.895833333333332
+  },
+  "answer_f1_by_type": {
+    "ft_main_qtest": {
+      "extractive": 0.3593810089378124,
+      "free_form": 0.21815663767198962,
+      "yes_no": 0.34248557683092784
+    },
+    "b1_qtest": {
+      "extractive": 0.33493916311609373,
+      "free_form": 0.22207834315768207,
+      "yes_no": 0.280467720685112
+    },
+    "b0_qtest": {
+      "extractive": 0.2277086968745813,
+      "free_form": 0.15512446169897803,
+      "yes_no": 0.2474286241409529
+    }
+  }
+}

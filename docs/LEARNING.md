@@ -91,3 +91,20 @@ tracebacks/logs, reproduce errors).
 - What it proved: the full local verification loop (smoke, tests, lint,
   eval, CI) runs green end to end, and the two CI failures found were
   real portability defects, not flakes.
+
+## F5 — sealed test evaluation (2026-11-27)
+
+Concept: the sealed test is evaluated exactly once, with pre-registered
+thresholds, and a refuted hypothesis is reported as refuted.
+What I ran: `scripts/final_eval_compute.py` (paper-cluster bootstrap,
+seed 20261207) on the 11 per-(model,split) metrics; `scripts/run_redteam.py`
+(15 cases, 2 repeats, B0 + FT-main); `docmind_ft/regression.py` (ARC-Easy,
+seeded 200); `scripts/error_analysis.py` (30 Q-TEST + 20 HOLD failures).
+What it proved: format/citation are near-perfect (HY1 confirmed) but the
+answer-F1 gain (+0.027) is below the bar (HY2 refuted), abstention improved
+a lot yet over-refuses (HY3 refuted), and keyfact coverage did not improve
+(HY4 refuted). No regression and no jailbreak (HY5 confirmed).
+Lesson: the 120B reference does not follow the citation contract, so it is
+not a quality ceiling on HOLD — a reference that ignores the format cannot
+set the bar for coverage. And a model can learn "say I don't know" too well:
+abstain_acc 0.636 with over_refusal 0.143.
