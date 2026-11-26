@@ -54,3 +54,40 @@ tracebacks/logs, reproduce errors).
 - **HO-2 (F3.4 resume)**: the 12-step run completed (94.85s, peak VRAM 5.98 GB) but the external kill-resume (HO-2) is still outstanding. Hamza must perform the kill by hand at heartbeat step 6, then resume with --resume-from checkpoint-4 --max-steps 12. Pass criteria: resumed log starts at step 5, final global_step 12, LR at step 5 after resume equals pre-kill. Results will be appended to this log after the run completes.
 
 - **HO-2 (F3.4 resume, VERIFIED PASS 2026-11-26)**: the resume from checkpoint-4 works after the torch 2.6.0 upgrade. The first 12-step run finished in 105 s before the manual kill landed, so the kill itself never happened -- but the resume (the part that matters) was verified: resumed log starts at step 5, final global_step 12, LR at step 5 after resume = 0.00015 = pre-kill. The torch upgrade (2.5.1 -> 2.6.0) was needed because transformers refuses torch.load below 2.6 (CVE-2025-32434); upgrading torch also forced torchvision/torchaudio to match (the old torchvision broke the peft import). The learn test re-run on torch 2.6.0 passes all three criteria (ratio 0.0184, 8/8 exact match, no NaN), so the upgrade did not change the learning. Note: a resumed run saves its adapter in F32 (97 MB) instead of BF16 (48 MB) -- same weights, just a different dtype.
+
+## F0/F1 hands-on walkthrough -- completed by Hamza (2026-11-26)
+
+- F0 item 1 (smoke test): ran `scripts\smoke_qlora.py` himself.
+  `SMOKE_OK model=Qwen/Qwen3-0.6B steps=5 mask=PASS peak_vram_gb=1.65
+  elapsed_s=47`; mask test 20/20, train losses 1.7556 -> 0.0053,
+  adapter saved to `B:\p8\runs\f0-smoke`; reload generation produced
+  a citation-grounded answer. Lesson: a folder path typed as a command
+  fails; `cd` into the folder first, then run the command.
+- F0 item 2 (CI file): read `.github/workflows/ci.yml` (4 jobs: lint,
+  unit, gates, security) and checked the Actions tab. The two latest
+  runs were red; diagnosis found two real defects, both fixed hands-on:
+  (1) `tests/test_train.py` imported torch, which CI does not install
+  -- fixed with `pytest.importorskip("torch")` (commit 6323ec7);
+  (2) `tests/test_fetch_heldout.py` read a hardcoded Windows path to
+  the Project-7 repo on the laptop -- fixed by building a 24-paper
+  manifest with the file's own `_paper()`/`_write_manifest()` helpers
+  in `tmp_path` (commit bda2cd6). CI run #8 is green (17 s, all jobs
+  pass). Lesson: a test must be portable -- it may only read files
+  inside the repo or files it builds itself; a test that reads an
+  absolute path on one machine can never pass on CI.
+- F0 item 3 (local run): pytest 289 passed (fresh basetemp each run;
+  reusing a stale basetemp dir produces mass teardown PermissionErrors,
+  and running pytest from the wrong directory sweeps up unrelated
+  files); ruff check + format clean; `nvidia-smi` shows the GPU free;
+  `scripts\eval_learn8.py` 8/8 exact match, including both abstention
+  targets. Lesson: `cd` to the repo first, then run; pytest is CPU-only
+  so 0% GPU during a test run is expected.
+- F1 item 1 (inspect QASPER): ran `reports\logs\inspect_qasper.py`.
+  papers 888, questions 2593. First paper 1909.00694 (77 paragraphs,
+  9 questions); first question "What is the seed lexicon?" with two
+  annotator answers (one free-form, one extractive span); one
+  unanswerable question found (paper 1908.06606) -- the abstention
+  case the training data is built around.
+- What it proved: the full local verification loop (smoke, tests, lint,
+  eval, CI) runs green end to end, and the two CI failures found were
+  real portability defects, not flakes.
