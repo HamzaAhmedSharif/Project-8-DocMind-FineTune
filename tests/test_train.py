@@ -11,6 +11,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("torch")
+
 from docmind_ft.train import (  # noqa: E402, F401
     build_example,
     get_git_commit,
