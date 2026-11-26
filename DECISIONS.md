@@ -725,3 +725,28 @@ of script 3.1 open the F0 section, with their evidence.
 - Rejected: monkey-patching check_torch_load_is_safe (bypasses a security gate; unnecessary once torch is upgraded); accepting no-resume (F4's 6-8 h main run would have no crash recovery on a laptop that has already BSOD'd 4 times during training).
 - Tradeoff accepted: the torch upgrade changes the CUDA kernels slightly, so training losses drift <1% from the torch 2.5.1 baselines; the F3.1 smoke eval_loss 0.7897 and F3.3 first-4 mean 1.820 are now torch-2.5.1 baselines, re-verified on 2.6.0 by the resume (step-5 exact) and learn re-run.
 - Would revisit if: a future torch upgrade is needed for a new transformers/trl version (re-verify the same three checks: gate, stack import, learn re-run).
+
+## Decision: F4 max_length cutoff 2816 (try-first, verified by canary) (2026-11-26)
+
+Context: the F4 main run needs a max_length filter (filter, never truncate)
+because long rows (2,917-3,041 tokens) OOM on the 8 GB card, while median
+rows (~2,327 tokens) fit. Hamza's plan: try 2816 first; if it fails, fall
+back to 2560. Sol refined it to a canary: train 6 micro-steps on the 10
+longest rows of the 2816 set (2,759-2,811 tokens) before committing 6-8 h.
+
+Evidence (all measured 2026-11-26, real build_example):
+- data/train_f4_2816.jsonl: 1,423 rows kept, 21 dropped (1.5%).
+- Canary (job p8-f4-canary2816, runs/ft-canary-2816): 6/6 steps, exit 0,
+  train_runtime 52.64 s (~8.8 s/micro-step), peak VRAM 7.29 GB, NO OOM,
+  NO shared-memory spill (the spilling long probe ran ~36 s/micro-step).
+- I2 on the full 2816 set: 1423/1423 valid, 0 dropped, frac 1.0.
+- I3 on the full 2816 set: 20/20 passed.
+- F4 config changes applied to configs/train_main.yaml: logging_steps 1,
+  save_steps 2, eval_on_start true (GA stays 16, epochs 2, LR 2e-4).
+
+Decision: cutoff is 2816. The 2560 fallback is NOT needed (2816 verified
+to fit with ~0.7 GB headroom). F4 sizing unchanged: 180 steps at GA 16,
+~6.4-8.0 h at m=8-10 s/micro-step. F4 main run is ready to launch
+(data/train_f4_2816.jsonl, --data flag); it is a 6-8 h overnight job and
+resume is verified (torch 2.6.0), so a crash would resume from the last
+checkpoint (save_steps 2).
