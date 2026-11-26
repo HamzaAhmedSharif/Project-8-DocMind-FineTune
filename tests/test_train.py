@@ -89,14 +89,14 @@ def test_load_config_valid():
     """Valid config YAML loads with all expected top-level keys."""
     cfg = load_config(REPO_ROOT / "configs" / "train_main.yaml")
     expected_top = {"base_model", "revision", "seed", "quant", "lora", "train"}
-    assert expected_top <= set(
-        cfg.keys()
-    ), f"Missing top-level keys: {expected_top - set(cfg.keys())}"
+    assert expected_top <= set(cfg.keys()), (
+        f"Missing top-level keys: {expected_top - set(cfg.keys())}"
+    )
     # lora sub-keys
     lora_expected = {"r", "alpha", "dropout", "bias", "task_type", "target_modules"}
-    assert lora_expected <= set(
-        cfg["lora"].keys()
-    ), f"Missing lora keys: {lora_expected - set(cfg['lora'].keys())}"
+    assert lora_expected <= set(cfg["lora"].keys()), (
+        f"Missing lora keys: {lora_expected - set(cfg['lora'].keys())}"
+    )
     # train sub-keys
     train_expected = {
         "epochs",
@@ -113,9 +113,9 @@ def test_load_config_valid():
         "completion_only_loss",
         "logging_steps",
     }
-    assert train_expected <= set(
-        cfg["train"].keys()
-    ), f"Missing train keys: {train_expected - set(cfg['train'].keys())}"
+    assert train_expected <= set(cfg["train"].keys()), (
+        f"Missing train keys: {train_expected - set(cfg['train'].keys())}"
+    )
 
 
 def test_load_config_nonexistent():
@@ -185,9 +185,9 @@ def test_build_example_conversational():
         tokenizer, prompt_msgs, completion_msgs, max_length=3072
     )
     # Alignment by construction: input_ids and labels must have the same length
-    assert len(input_ids) == len(
-        labels
-    ), f"input_ids length {len(input_ids)} != labels length {len(labels)}"
+    assert len(input_ids) == len(labels), (
+        f"input_ids length {len(input_ids)} != labels length {len(labels)}"
+    )
     # Prompt tokens must have label -100
     has_negative_100 = any(la == -100 for la in labels)
     # Completion tokens must have real labels (not -100)
